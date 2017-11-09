@@ -11,7 +11,12 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
+    if (!Web3.givenProvider) {
+      alert("Для корректной работы приложения нужно установить Chrome-расширение \
+      MetaMask.\nСсылка: https://metamask.io/");
+    } else {
+      this.web3 = new Web3(Web3.givenProvider);
+    }
 
     this.state = {
       // 1 - employee, 2 - org, 3 - none
@@ -84,7 +89,8 @@ class App extends Component {
   }
 
   render() {
-    let body = null
+    let body = null;
+
     switch (this.state.flag) {
       case 1:
         body = <Employee/>;
