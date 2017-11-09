@@ -33,7 +33,7 @@ class App extends Component {
   }
 
   instantiateContract() {
-    const contractInfo = require('../build/contracts/CareerTrackerInfo.json');
+    const contractInfo = require('../contracts/CareerTrackerInfo.json');
     const careerTracker = new this.web3.eth
             .Contract(contractInfo.abi, contractInfo.address);
     this.setState({
