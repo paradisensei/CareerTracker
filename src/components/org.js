@@ -1,8 +1,6 @@
-import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
-import store from '../store';
+import React from 'react';
 
-class Org extends Component {
+export default class Org extends React.Component {
 
   constructor(props) {
     super(props)
@@ -14,10 +12,7 @@ class Org extends Component {
   }
 
   componentWillMount() {
-    // get contract and user from app state
-    const state = store.getState()
-    const contract = state.contract
-    const user = state.user
+    const {contract, user} = this.props;
 
     // get staff
     contract.methods.getStaff().call({from: user.address}).then(staff => {
@@ -84,17 +79,18 @@ class Org extends Component {
         <h3>Профессионалы:</h3>
         <ul> {
           this.state.employees.map((e) =>
-          <li key={e.email}>
-            <p>{e.name}, {e.email}, {e.profession}, {e.city}, {e.passport}</p>
-            <Button onClick={makeOffer.bind(this, e.address)}>
-              Сделать предложение о работе
-            </Button>
-          </li>)
+            <li key={e.email}>
+              <p>{e.name}, {e.email}, {e.profession}, {e.city}, {e.passport}</p>
+              <button onClick={makeOffer.bind(this, e.address)}>
+                Сделать предложение о работе
+              </button>
+            </li>
+          )
         } </ul>
       </div>
     }
 
-    const user = store.getState().user
+    const user = this.props.user;
     return (
       <div>
         <h2>Профиль вашей организации</h2>
@@ -110,10 +106,7 @@ class Org extends Component {
 }
 
 function makeOffer(address) {
-  const state = store.getState();
   //TODO get position from user input
-  state.contract.methods.makeOffer(address, 'Developer')
-    .send({from: state.user.address}, (e, result) => {});
+  this.props.contract.methods.makeOffer(address, 'Developer')
+    .send({from: this.props.user.address}, (e, result) => {});
 }
-
-export default Org

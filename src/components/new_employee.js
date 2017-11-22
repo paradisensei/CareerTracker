@@ -1,9 +1,6 @@
-import React, { Component } from 'react'
-import store from '../store'
+import React from 'react';
 
-import { Button, Form, FormGroup, FormControl } from 'react-bootstrap';
-
-class NewEmployee extends Component {
+export default class NewEmployee extends React.Component {
 
   constructor(props) {
     super(props)
@@ -14,21 +11,21 @@ class NewEmployee extends Component {
 
   render() {
     return (
-      <Form inline>
-        <FormGroup>
-          <FormControl name='name' type="text" placeholder="Имя:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='email' type="text" placeholder="Email:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='city' type="text" placeholder="Город:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='passport' type="number" placeholder="Паспорт:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='profession' type="text" placeholder="Профессия:"
-            onChange={this.handleInputChange}/>
-          <Button onClick={this.handleSubmit}>Submit</Button>
-        </FormGroup>
-      </Form>
+      <form>
+        <fieldset>
+          <input type='text' name='name' placeholder='Имя:'
+                 onChange={this.handleInputChange}/>
+          <input type='text' name='email' placeholder='Email:'
+                 onChange={this.handleInputChange}/>
+          <input type='text' name='city' placeholder='Город:'
+                 onChange={this.handleInputChange}/>
+          <input type='number' name='passport' placeholder='Паспорт:'
+                 onChange={this.handleInputChange}/>
+          <input type='text' name='profession' placeholder='Профессия:'
+                 onChange={this.handleInputChange}/>
+          <button onClick={this.handleSubmit}>Submit</button>
+        </fieldset>
+      </form>
     );
   }
 }
@@ -40,11 +37,8 @@ function handleInputChange(event) {
 }
 
 function handleSubmit() {
-  const state = store.getState();
   this.props.web3.eth.getAccounts().then(accounts => {
-    state.contract.methods.newEmployee(...Object.values(this.state))
+    this.props.contract.methods.newEmployee(...Object.values(this.state))
     .send({from: accounts[0]}, (e, result) => {});
   });
 }
-
-export default NewEmployee

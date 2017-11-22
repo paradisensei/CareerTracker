@@ -1,10 +1,9 @@
-import React, { Component } from 'react'
-import { Jumbotron, Button } from 'react-bootstrap';
+import React from 'react';
 
 import NewEmployee from './new_employee';
 import NewOrg from './new_org';
 
-class Auth extends Component {
+export default class Auth extends React.Component {
 
   constructor(props) {
     super(props)
@@ -18,35 +17,33 @@ class Auth extends Component {
       body = this.state.child;
     } else {
       body = <div>
-        <Button onClick={handleOrg.bind(this)}>
+        <button onClick={handleOrg.bind(this)}>
           Я представляю организацию
-        </Button>
-        <Button onClick={handleEmployee.bind(this)}>
+        </button>
+        <button onClick={handleEmployee.bind(this)}>
           Я представляю себя самого
-        </Button>
+        </button>
       </div>
     }
 
     return (
-      <Jumbotron>
+      <div>
         <h1>Welcome!</h1>
         <p>У вас еще нет аккаунта в нашем сервисе. Создайте же его!</p>
         {body}
-      </Jumbotron>
+      </div>
     );
   }
 }
 
 function handleOrg(event) {
   this.setState({
-    child: <NewOrg web3={this.props.web3}/>
+    child: <NewOrg web3={this.props.web3} contract={this.contract} user={this.user}/>
   });
 }
 
 function handleEmployee(event) {
   this.setState({
-    child: <NewEmployee web3={this.props.web3}/>
+    child: <NewEmployee web3={this.props.web3} contract={this.contract} user={this.user}/>
   });
 }
-
-export default Auth

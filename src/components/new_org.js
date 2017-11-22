@@ -1,9 +1,6 @@
-import React, { Component } from 'react'
-import store from '../store'
+import React from 'react';
 
-import { Button, Form, FormGroup, FormControl } from 'react-bootstrap';
-
-class NewOrg extends Component {
+export default class NewOrg extends React.Component {
 
   constructor(props) {
     super(props)
@@ -14,19 +11,19 @@ class NewOrg extends Component {
 
   render() {
     return (
-      <Form inline>
-        <FormGroup>
-          <FormControl name='name' type="text" placeholder="Название:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='city' type="text" placeholder="Город:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='inn' type="number" placeholder="ИНН:"
-            onChange={this.handleInputChange}/>
-          <FormControl name='sphere' type="text" placeholder="Сфера деятельности:"
-            onChange={this.handleInputChange}/>
-          <Button onClick={this.handleSubmit}>Submit</Button>
-        </FormGroup>
-      </Form>
+      <form>
+        <fieldset>
+          <input type='text' name='name' placeholder='Название:'
+                 onChange={this.handleInputChange}/>
+          <input type='text' name='city' placeholder='Город:'
+                 onChange={this.handleInputChange}/>
+          <input type='number' name='inn' placeholder='ИНН:'
+                 onChange={this.handleInputChange}/>
+          <input type='text' name='sphere' placeholder='Сфера деятельности:'
+                 onChange={this.handleInputChange}/>
+          <button onClick={this.handleSubmit}>Submit</button>
+        </fieldset>
+      </form>
     );
   }
 }
@@ -38,11 +35,8 @@ function handleInputChange(event) {
 }
 
 function handleSubmit() {
-  const state = store.getState();
   this.props.web3.eth.getAccounts().then(accounts => {
-    state.contract.methods.newOrg(...Object.values(this.state))
+    this.props.contract.methods.newOrg(...Object.values(this.state))
     .send({from: accounts[0]}, (e, result) => {});
   });
 }
-
-export default NewOrg

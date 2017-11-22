@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
-import getDate from '../utils/getDate';
-import store from '../store';
+import React from 'react';
+import getDate from '../lib/getDate';
 
-class Employee extends Component {
+export default class Employee extends React.Component {
 
   constructor(props) {
     super(props)
@@ -15,14 +13,11 @@ class Employee extends Component {
   }
 
   componentWillMount() {
-    // get contract and user from app state
-    const state = store.getState()
-    const contract = state.contract
-    const user = state.user
+    const { contract, user } = this.props;
 
     // get all offers with 'No' status
     contract.methods.getOffersCount().call({from: user.address}).then(count => {
-      for (var i = 0; i < Number(count); i++) {
+      for (let i = 0; i < count; i++) {
         const index = i;
         contract.methods.offersOf(user.address, i).call((e, offer) => {
           if (offer[0] && Number(offer[3]) === 0) {
@@ -45,7 +40,7 @@ class Employee extends Component {
 
     // get employment records
     contract.methods.getEmpRecordsCount().call({from: user.address}).then(count => {
-      for (var i = 0; i < Number(count); i++) {
+      for (let i = 0; i < Number(count); i++) {
         contract.methods.empRecordsOf(user.address, i).call((e, record) => {
           if (record[0]) {
             contract.methods.orgInfo(record[0]).call((e, org) => {
@@ -79,12 +74,8 @@ class Employee extends Component {
                 <p>
                 {o.date} {o.orgName} пригласил/а вас на должность {o.position}
                 </p>
-                <Button onClick={considerOffer.bind(this, o.index, true)}>
-                  Принять
-                </Button>
-                <Button onClick={considerOffer.bind(this, o.index, false)}>
-                  Отказаться
-                </Button>
+                <button onClick={considerOffer.bind(this, o.index, true)}>Принять</button>
+                <button onClick={considerOffer.bind(this, o.index, false)}>Отказаться</button>
               </li>
             )
           }
@@ -96,11 +87,12 @@ class Employee extends Component {
       empRecords = <div>
         <h3>Ваш послужной список</h3>
         <ul> {
-          this.state.empRecords.map((r) => {
-            const text = r.status == 0 ? 'приняты на должность'
+          this.state.empRecords.map((r, i) => {
+            const status = Number(r.status);
+            const text = status === 0 ? 'приняты на должность'
               : 'уволены с должности';
             return (
-              <li key={r.date}>
+              <li key={i}>
                 <p>{r.date} вы были {text} {r.position} в {r.orgName}</p>
               </li>
             );
@@ -109,7 +101,7 @@ class Employee extends Component {
       </div>
     }
 
-    const user = store.getState().user
+    const user = this.props.user;
     return (
       <div>
         <h2>Ваш профиль</h2>
@@ -126,9 +118,6 @@ class Employee extends Component {
 }
 
 function considerOffer(index, approve) {
-  const state = store.getState();
-  state.contract.methods.considerOffer(index, approve)
-    .send({from: state.user.address}, (e, result) => {});
+  this.props.contract.methods.considerOffer(index, approve)
+    .send({from: this.props.user.address}, (e, result) => {});
 }
-
-export default Employee

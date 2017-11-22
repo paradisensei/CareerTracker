@@ -1,19 +1,18 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Web3 from 'web3';
 
-import Employee from './components/employee';
-import Org from './components/org';
-import Auth from './components/auth';
-import store from './store';
+import Employee from '../components/employee';
+import Org from '../components/org';
+import Auth from '../components/auth';
 
-class App extends Component {
+export default class App extends React.Component {
 
   constructor(props) {
     super(props);
 
     if (!Web3.givenProvider) {
-      alert("Для корректной работы приложения нужно установить Chrome-расширение \
-      MetaMask.\nСсылка: https://metamask.io/");
+      alert('Для корректной работы приложения нужно установить Chrome-расширение\n' +
+      'MetaMask.\nСсылка: https://metamask.io/');
     } else {
       this.web3 = new Web3(Web3.givenProvider);
     }
@@ -33,17 +32,9 @@ class App extends Component {
   }
 
   instantiateContract() {
-    const contractInfo = require('../contracts/CareerTrackerInfo.json');
-    const careerTracker = new this.web3.eth
-            .Contract(contractInfo.abi, contractInfo.address);
-    this.setState({
-      contract: careerTracker
-    });
-
-    store.dispatch({
-      type: 'CONTRACT_INITIALIZED',
-      payload: careerTracker
-    })
+    const contractInfo = require('../properties/CareerTrackerInfo.json');
+    this.contract = new this.web3.eth
+      .Contract(contractInfo.abi, contractInfo.address);
   }
 
   findUser() {
@@ -51,32 +42,32 @@ class App extends Component {
     this.web3.eth.getAccounts()
       .then(accounts => {
         etherbase = accounts[0];
-        return this.state.contract.methods.employeeInfo(etherbase).call();
+        return this.contract.methods.employeeInfo(etherbase).call();
       })
       .then(employee => {
         if (employee[1]) {
-          store.dispatch({type: 'USER', payload: {
+          this.user = {
             address: etherbase,
             name: employee[0],
             email: employee[1],
             city: employee[2],
             passport: Number(employee[3]),
             profession: employee[4]
-          }})
+          };
           this.setState({
             flag: 1
           })
         } else {
-          this.state.contract.methods.orgInfo(etherbase).call((e, org) => {
+          this.contract.methods.orgInfo(etherbase).call((e, org) => {
             let flag = 2
             if (!e && org[0]) {
-              store.dispatch({type: 'USER', payload: {
+              this.user = {
                 address: etherbase,
                 name: org[0],
                 city: org[1],
                 inn: org[2],
                 sphere: org[3]
-              }})
+              };
             } else {
               flag = 3
             }
@@ -93,13 +84,13 @@ class App extends Component {
 
     switch (this.state.flag) {
       case 1:
-        body = <Employee/>;
+        body = <Employee contract={this.contract} user={this.user}/>;
         break;
       case 2:
-        body = <Org/>;
+        body = <Org contract={this.contract} user={this.user}/>;
         break;
       case 3:
-        body = <Auth web3={this.web3}/>;
+        body = <Auth web3={this.web3} contract={this.contract} user={this.user}/>;
         break;
       default:
         // will NOT execute
@@ -110,5 +101,3 @@ class App extends Component {
     );
   }
 }
-
-export default App
