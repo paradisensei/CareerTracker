@@ -13,14 +13,20 @@ import { Provider } from 'react-redux';
 import { Store, History } from 'store/index';
 
 import Main from './containers/Main';
-import App from './containers/App';
+import Entrypoint from './containers/Entrypoint';
+
+import Employee from './components/Employee';
+import Auth from './components/auth';
 import Empty from './components/Empty';
+
 
 ReactDOM.render(
   <Provider store={Store}>
     <Router history={History}>
       <Route path='/' component={Main}>
-        <IndexRoute component={App}/>
+        <IndexRoute component={Entrypoint}/>
+        <Route path='/auth' component={Auth}/>
+        <Route path='/home' component={Employee}/>
         <Route path='*' component={Empty}/>
       </Route>
     </Router>

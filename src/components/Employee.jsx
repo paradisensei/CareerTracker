@@ -1,7 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
+
 import getDate from '../lib/getDate';
 
-export default class Employee extends React.Component {
+class Employee extends React.Component {
 
   constructor(props) {
     super(props)
@@ -121,3 +123,10 @@ function considerOffer(index, approve) {
   this.props.contract.methods.considerOffer(index, approve)
     .send({from: this.props.user.address}, (e, result) => {});
 }
+
+const mapStateToProps = (state) => ({
+  contract: state.contract.instance,
+  user: state.user.info
+});
+
+export default connect(mapStateToProps)(Employee);

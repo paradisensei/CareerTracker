@@ -1,15 +1,19 @@
-export default class Screen{
+export default class Screen {
   
-  static get width(){
+  static get width() {
     return window.innerWidth
     || document.documentElement.clientWidth
     || document.body.clientWidth;
   }
 
-  static get height(){
+  static get height() {
     return window.innerHeight
     || document.documentElement.clientHeight
     || document.body.clientHeight;
+  }
+
+  static get drawerWidth() {
+    return 240;
   }
   
 }

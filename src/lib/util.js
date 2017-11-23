@@ -75,7 +75,7 @@ export const ReducerFactory =
 /**
  * Immutable assign objects
  * @param {Object} object 
- * @param {Objects} objects 
+ * @param {Object} objects
  */
 export const Assing =
 (object, ...objects) =>
