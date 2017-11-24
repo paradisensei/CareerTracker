@@ -2,8 +2,6 @@ import {
   SET_USER
 } from "../constants/actions";
 
-const contractInfo = require('../properties/CareerTrackerInfo.json');
-
 
 export const setUser = () =>
   (dispatch, getState) => {
@@ -22,10 +20,7 @@ export const setUser = () =>
           contract.methods.orgInfo(account).call
         ]);
       })
-      .then(users => {
-        const employee = users[0];
-        const org = users[1];
-
+      .then(([employee, org]) => {
         // check if employee or org
         if (employee[1]) {
           user = {

@@ -74,9 +74,9 @@ export const ReducerFactory =
 
 /**
  * Immutable assign objects
- * @param {Object} object 
+ * @param {Object} object
  * @param {Object} objects
  */
-export const Assing =
-(object, ...objects) =>
-  Object.assign({}, object, ...objects);
+export const Assign =
+  (object, ...objects) =>
+    Object.assign({}, object, ...objects);

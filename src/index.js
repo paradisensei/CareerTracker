@@ -14,9 +14,9 @@ import { Store, History } from 'store/index';
 
 import Main from './containers/Main';
 import Entrypoint from './containers/Entrypoint';
+import Auth from './containers/Auth';
 
 import Employee from './components/Employee';
-import Auth from './components/auth';
 import Empty from './components/Empty';
 
 

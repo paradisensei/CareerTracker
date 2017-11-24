@@ -1,12 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class NewEmployee extends React.Component {
 
   constructor(props) {
-    super(props)
-
+    super(props);
     this.handleInputChange = handleInputChange.bind(this);
-    this.handleSubmit = handleSubmit.bind(this);
   }
 
   render() {
@@ -23,7 +22,7 @@ export default class NewEmployee extends React.Component {
                  onChange={this.handleInputChange}/>
           <input type='text' name='profession' placeholder='Профессия:'
                  onChange={this.handleInputChange}/>
-          <button onClick={this.handleSubmit}>Submit</button>
+          <button onClick={handleSubmit.bind(this)}>Submit</button>
         </fieldset>
       </form>
     );
@@ -37,8 +36,9 @@ function handleInputChange(event) {
 }
 
 function handleSubmit() {
-  this.props.web3.eth.getAccounts().then(accounts => {
-    this.props.contract.methods.newEmployee(...Object.values(this.state))
-    .send({from: accounts[0]}, (e, result) => {});
-  });
+  this.props.addUser(this.state, 'employee');
+}
+
+NewEmployee.propTypes = {
+  addUser: PropTypes.func.isRequired
 }

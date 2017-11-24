@@ -68,10 +68,10 @@ const styleSheet = theme => ({
   },
   drawerHeader: theme.mixins.toolbar,
   content: {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.primary,
     display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     width: '100%',
     padding: theme.spacing.unit * 3,
