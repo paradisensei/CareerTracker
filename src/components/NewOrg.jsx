@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {
+  ORG
+} from '../constants/roles';
+
 export default class NewOrg extends React.Component {
 
   constructor(props) {
@@ -34,7 +38,7 @@ function handleInputChange(event) {
 }
 
 function handleSubmit() {
-  this.props.addUser(this.state, 'org');
+  this.props.addUser(this.state, ORG);
 }
 
 NewOrg.propTypes = {

@@ -99,7 +99,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   setUser: () => dispatch(setUser()),
-  addUser: (user, type) => dispatch(addUser(user, type))
+  addUser: (user, role) => dispatch(addUser(user, role))
 });
 
 const styles = theme => ({

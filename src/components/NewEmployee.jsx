@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import {
+  EMPLOYEE
+} from '../constants/roles';
+
 export default class NewEmployee extends React.Component {
 
   constructor(props) {
@@ -36,7 +40,7 @@ function handleInputChange(event) {
 }
 
 function handleSubmit() {
-  this.props.addUser(this.state, 'employee');
+  this.props.addUser(this.state, EMPLOYEE);
 }
 
 NewEmployee.propTypes = {

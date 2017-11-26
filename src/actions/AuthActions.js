@@ -3,9 +3,12 @@ import {
   ADD_USER_PENDING,
   ADDED_USER
 } from "../constants/actions";
+import {
+  EMPLOYEE, ORG
+} from '../constants/roles';
 
 
-export const addUser = (user, type) =>
+export const addUser = (user, role) =>
   (dispatch, getState) => {
 
     dispatch({
@@ -20,11 +23,11 @@ export const addUser = (user, type) =>
       const address = accounts[0];
 
       let method;
-      switch (type) {
-        case 'employee':
+      switch (role) {
+        case EMPLOYEE:
           method = contract.methods.newEmployee(...Object.values(user));
           break;
-        case 'org':
+        case ORG:
           method = contract.methods.newOrg(...Object.values(user));
           break;
         default:
@@ -36,7 +39,7 @@ export const addUser = (user, type) =>
           receipt =>
             dispatch({
               type: ADDED_USER,
-              info: Assign(user, { address: address })
+              info: Assign(user, { address: address, role:role  })
             })
         )
         //TODO add error handling

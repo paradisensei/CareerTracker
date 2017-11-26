@@ -15,9 +15,11 @@ import { Store, History } from 'store/index';
 import Main from './containers/Main';
 import Entrypoint from './containers/Entrypoint';
 import Auth from './containers/Auth';
+import Home from './containers/Home';
 
 import Employee from './components/Employee';
 import Empty from './components/Empty';
+import Org from './components/org';
 
 
 ReactDOM.render(
@@ -26,7 +28,11 @@ ReactDOM.render(
       <Route path='/' component={Main}>
         <IndexRoute component={Entrypoint}/>
         <Route path='/auth' component={Auth}/>
-        <Route path='/home' component={Employee}/>
+        <Route path='/home' component={({ children }) => children}>
+          <IndexRoute component={Home}/>
+          <Route path='/home/employee' component={Employee}/>
+          <Route path='/home/org' component={Org}/>
+        </Route>
         <Route path='*' component={Empty}/>
       </Route>
     </Router>

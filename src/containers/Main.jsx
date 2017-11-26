@@ -1,9 +1,15 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { compose } from '../lib/util';
 
 import Screen from '../lib/screen';
+import {
+  EMPLOYEE, ORG
+} from '../constants/roles';
 
-import Menu from '../components/Menu';
+import EmployeeMenu from '../components/EmployeeMenu';
+import OrgMenu from '../components/OrgMenu';
 
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
@@ -13,38 +19,57 @@ import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 
 
-const Main = ({ classes, children }) => (
-  <div className={classes.main}>
-    <div className={classes.appFrame}>
-      <AppBar className={classes.appBar}>
-        <Toolbar>
-          <Typography type='title' color='inherit' noWrap>
-            Career tracker
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        type='permanent'
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <div className={classes.drawerHeader}/>
-        <Divider/>
-        <Menu/>
-      </Drawer>
-      <main className={classes.content}>
-        {children}
-      </main>
+const Main = ({ classes, user, children }) => {
+  let menu = null;
+  if (user.info) {
+    switch (user.info.role) {
+      case EMPLOYEE:
+        menu = <EmployeeMenu/>;
+        break;
+      case ORG:
+        menu = <OrgMenu/>;
+        break;
+      default:
+        //TODO
+    }
+  }
+  return (
+    <div className={classes.main}>
+      <div className={classes.appFrame}>
+        <AppBar className={classes.appBar}>
+          <Toolbar>
+            <Typography type='title' color='inherit' noWrap>
+              Career tracker
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          type='permanent'
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <div className={classes.drawerHeader}/>
+          <Divider/>
+          {menu}
+        </Drawer>
+        <main className={classes.content}>
+          {children}
+        </main>
+      </div>
     </div>
-  </div>
-);
+  )
+};
 
 Main.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-const styleSheet = theme => ({
+const mapStateToProps = (state) => ({
+  user: state.user
+});
+
+const styles = theme => ({
   main: {
     width: '100%',
     height: Screen.height,
@@ -84,4 +109,7 @@ const styleSheet = theme => ({
   }
 });
 
-export default withStyles(styleSheet)(Main);
+export default compose(
+  withStyles(styles),
+  connect(mapStateToProps)
+)(Main);

@@ -1,7 +1,9 @@
 import {
   SET_USER
 } from "../constants/actions";
-
+import {
+  EMPLOYEE, ORG
+} from '../constants/roles';
 
 export const setUser = () =>
   (dispatch, getState) => {
@@ -17,7 +19,7 @@ export const setUser = () =>
         account = accounts[0];
         return Promise.all([
           contract.methods.employeeInfo(account).call(),
-          contract.methods.orgInfo(account).call
+          contract.methods.orgInfo(account).call()
         ]);
       })
       .then(([employee, org]) => {
@@ -25,7 +27,7 @@ export const setUser = () =>
         if (employee[1]) {
           user = {
             address: account,
-            role: 'employee',
+            role: EMPLOYEE,
             name: employee[0],
             email: employee[1],
             city: employee[2],
@@ -35,7 +37,7 @@ export const setUser = () =>
         } else if (org[0]) {
           user = {
             address: account,
-            role: 'org',
+            role: ORG,
             name: org[0],
             city: org[1],
             inn: org[2],
