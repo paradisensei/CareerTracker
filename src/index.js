@@ -16,10 +16,10 @@ import Main from './containers/Main';
 import Entrypoint from './containers/Entrypoint';
 import Auth from './containers/Auth';
 import Home from './containers/Home';
+import Employee from './containers/employee/Employee';
 
-import Employee from './components/Employee';
-import Empty from './components/Empty';
-import Org from './components/org';
+import Empty from './components/util/Empty';
+import Org from './components/org/org';
 
 
 ReactDOM.render(
@@ -31,6 +31,7 @@ ReactDOM.render(
         <Route path='/home' component={({ children }) => children}>
           <IndexRoute component={Home}/>
           <Route path='/home/employee' component={Employee}/>
+          <Route path='/home/employee/career' component={Empty}/>
           <Route path='/home/org' component={Org}/>
         </Route>
         <Route path='*' component={Empty}/>

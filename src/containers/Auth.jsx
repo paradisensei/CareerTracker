@@ -6,9 +6,9 @@ import { compose } from '../lib/util';
 import { setUser } from '../actions/EntrypointActions';
 import { addUser } from '../actions/AuthActions';
 
-import NewEmployee from '../components/NewEmployee';
-import NewOrg from '../components/NewOrg';
-import Empty from '../components/Empty';
+import NewEmployee from '../components/employee/NewEmployee';
+import NewOrg from '../components/org/NewOrg';
+import Empty from '../components/util/Empty';
 
 import { withStyles } from 'material-ui/styles';
 import List, { ListItem, ListItemText } from 'material-ui/List';

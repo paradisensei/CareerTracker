@@ -8,8 +8,8 @@ import {
   EMPLOYEE, ORG
 } from '../constants/roles';
 
-import EmployeeMenu from '../components/EmployeeMenu';
-import OrgMenu from '../components/OrgMenu';
+import EmployeeMenu from '../components/employee/EmployeeMenu';
+import OrgMenu from '../components/org/OrgMenu';
 
 import { withStyles } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';

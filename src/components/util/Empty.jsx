@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 
 import Img from 'react-image'
-import Logo from '../assets/logo.svg';
-import Screen from '../lib/screen';
+import Logo from '../../assets/spinner.svg';
+import Screen from '../../lib/screen';
 
 const styleSheet = {
   main: {

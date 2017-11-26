@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {
   ORG
-} from '../constants/roles';
+} from '../../constants/roles';
 
 export default class NewOrg extends React.Component {
 

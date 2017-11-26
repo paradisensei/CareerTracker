@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {
   EMPLOYEE
-} from '../constants/roles';
+} from '../../constants/roles';
 
 export default class NewEmployee extends React.Component {
 
