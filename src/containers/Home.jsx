@@ -8,6 +8,8 @@ import {
   EMPLOYEE, ORG
 } from '../constants/roles';
 
+import Empty from '../components/util/Empty';
+
 class Home extends React.Component {
 
   componentWillMount() {
@@ -19,6 +21,10 @@ class Home extends React.Component {
 
   render() {
     const user = this.props.user;
+
+    if (!user.set) {
+      return <Empty/>
+    }
 
     // redirect to auth page if user has no account yet
     if (!user.info) {

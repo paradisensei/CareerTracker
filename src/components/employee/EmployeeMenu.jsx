@@ -6,7 +6,10 @@ import List, { ListItem, ListItemText } from 'material-ui/List';
 
 export default () => (
   <List>
-    <ListItem buttom onClick={go.bind(null, '/home/employee/career')}>
+    <ListItem button onClick={go.bind(null, '/home/employee')}>
+      <ListItemText primary='Мой профиль'/>
+    </ListItem>
+    <ListItem button onClick={go.bind(null, '/home/employee/career')}>
       <ListItemText primary='Моя карьера'/>
     </ListItem>
   </List>

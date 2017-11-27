@@ -4,15 +4,21 @@ import { connect } from 'react-redux';
 import { setOffers, considerOffer } from '../../actions/EmployeeActions';
 
 import Empty from '../../components/util/Empty';
+import EmployeeOffer from '../../components/employee/EmployeeOffer';
+
+import List from 'material-ui/List';
 
 class Employee extends React.Component {
 
   componentWillMount() {
-    this.props.setOffers();
+    // check whether user's offers are already set
+    if (!this.props.offers) {
+      this.props.setOffers();
+    }
   }
 
   render() {
-    const { user, offers } = this.props;
+    const { user, offers, considerOffer } = this.props;
 
     if (!offers) {
       return <Empty/>
@@ -21,31 +27,21 @@ class Employee extends React.Component {
     let body = null;
     if (offers.length > 0) {
       body = <div>
-        <h3>Ваши офферы</h3>
-        <ul>
-          {
-            offers.map((o, i) =>
-              <li key={i}>
-                <p>
-                  {o.date} {o.orgName} пригласил/а вас на должность {o.position}
-                </p>
-                <button onClick={considerOffer.bind(this, o.index, true)}>Принять</button>
-                <button onClick={considerOffer.bind(this, o.index, false)}>Отказаться</button>
-              </li>
-            )
-          }
-        </ul>
+        <h2>Ваши офферы</h2>
+        <List>{
+          offers.map(o => <EmployeeOffer offer={o} considerOffer={considerOffer}/>)
+        }</List>
       </div>
     }
 
     return (
       <div>
-        <h2>Ваш профиль</h2>
-        <p><i>ФИО:</i> {user.name}</p>
-        <p><i>Email:</i> {user.email}</p>
-        <p><i>Профессия:</i> {user.profession}</p>
-        <p><i>Город:</i> {user.city}</p>
-        <p><i>Паспортные данные:</i> {user.passport}</p>
+        <h1>Ваш профиль</h1>
+        <p><i>ФИО : </i>{user.name}</p>
+        <p><i>Email : </i>{user.email}</p>
+        <p><i>Профессия : </i>{user.profession}</p>
+        <p><i>Город : </i>{user.city}</p>
+        <p><i>Паспортные данные : </i>{user.passport}</p>
 
         {body}
       </div>
