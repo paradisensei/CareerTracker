@@ -28,8 +28,8 @@ EmployeeOffer.propTypes = {
 
 const styles = theme => ({
   button: {
-  margin: theme.spacing.unit,
-},
+    margin: theme.spacing.unit,
+  }
 });
 
 export default withStyles(styles)(EmployeeOffer);

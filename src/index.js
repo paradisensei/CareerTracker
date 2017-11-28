@@ -14,13 +14,17 @@ import { Store, History } from 'store/index';
 
 import Main from './containers/Main';
 import Entrypoint from './containers/Entrypoint';
+
 import Auth from './containers/Auth';
 import Home from './containers/Home';
+
 import Employee from './containers/employee/Employee';
 import EmployeeCareer from './containers/employee/EmployeeCareer';
 
+import Org from './containers/org/Org';
+import Search from './containers/org/Search';
+
 import Empty from './components/util/Empty';
-import Org from './components/org/org';
 
 
 ReactDOM.render(
@@ -34,6 +38,7 @@ ReactDOM.render(
           <Route path='/home/employee' component={Employee}/>
           <Route path='/home/employee/career' component={EmployeeCareer}/>
           <Route path='/home/org' component={Org}/>
+          <Route path='/home/org/search' component={Search}/>
         </Route>
         <Route path='*' component={Empty}/>
       </Route>

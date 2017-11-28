@@ -4,3 +4,6 @@ export const ADDED_USER = 'ADDED_USER';
 
 export const SET_OFFERS = 'SET_OFFERS';
 export const SET_CAREER_PROFILE = 'SET_CAREER_PROFILE';
+
+export const SET_EMPLOYEES = 'SET_EMPLOYEES';
+export const SET_PROFESSIONALS = 'SET_PROFESSIONALS';

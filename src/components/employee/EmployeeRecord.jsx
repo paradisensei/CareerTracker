@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ListItem, ListItemText } from 'material-ui/List';
 
-const EmployeeRecord = ({ classes, record }) => {
+const EmployeeRecord = ({ record }) => {
   const status = Number(record.status);
   const text = status === 0 ? 'приняты на должность'
     : 'уволены с должности';

@@ -97,7 +97,7 @@ const styles = theme => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    alignItems: 'center',
+    alignItems: 'left',
     width: '100%',
     padding: theme.spacing.unit * 3,
     height: Screen.height - 56,
