@@ -24,7 +24,7 @@ class EmployeeCareer extends React.Component {
       return <Empty/>
     }
 
-    let body = null;
+    let body = 'пока пуст, мы в вас верим :)';
     if (careerProfile.length > 0) {
       body = <div>
         <List>{

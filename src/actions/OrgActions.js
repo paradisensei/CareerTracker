@@ -78,20 +78,19 @@ export const setProfessionals = () =>
 
   };
 
-export const makeOffer = (address) =>
+export const makeOffer = (prof) =>
   (dispatch, getState) => {
 
     const contract = getState().contract.instance;
     const userAddress = getState().user.info.address;
     const professionals = getState().org.professionals;
 
-    // update professionals
-    dispatch({
-      type: SET_PROFESSIONALS,
-      professionals: professionals.filter(p => p.address !== address)
-    });
-
-    //TODO get position from user input
-    contract.methods.makeOffer(address, 'Developer')
-      .send({from: userAddress}, (e, result) => {});
+    contract.methods.makeOffer(prof.address, prof.profession)
+      .send({from: userAddress})
+      .on('transactionHash', hash =>
+        dispatch({
+          type: SET_PROFESSIONALS,
+          professionals: professionals.filter(p => p.address !== prof.address)
+        })
+      );
   }

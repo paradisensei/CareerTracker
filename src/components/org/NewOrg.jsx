@@ -5,7 +5,11 @@ import {
   ORG
 } from '../../constants/roles';
 
-export default class NewOrg extends React.Component {
+import { withStyles } from 'material-ui/styles';
+import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+
+class NewOrg extends React.Component {
 
   constructor(props) {
     super(props)
@@ -13,19 +17,29 @@ export default class NewOrg extends React.Component {
   }
 
   render() {
+    const { classes, back } = this.props;
+
     return (
       <form>
-        <fieldset>
-          <input type='text' name='name' placeholder='Название:'
-                 onChange={this.handleInputChange}/>
-          <input type='text' name='city' placeholder='Город:'
-                 onChange={this.handleInputChange}/>
-          <input type='number' name='inn' placeholder='ИНН:'
-                 onChange={this.handleInputChange}/>
-          <input type='text' name='sphere' placeholder='Сфера деятельности:'
-                 onChange={this.handleInputChange}/>
-          <button onClick={handleSubmit.bind(this)}>Submit</button>
-        </fieldset>
+        <TextField label='Название' name='name'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='Город' name='city'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='№ ИНН' name='inn'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='Сфера деятельности' name='sphere'
+                   onChange={this.handleInputChange}/>
+
+        <Button color="primary" className={classes.button}
+                onClick={handleSubmit.bind(this)}>
+          Создать!
+        </Button>
+        <Button color="accent" className={classes.button} onClick={back}>
+          Назад
+        </Button>
       </form>
     );
   }
@@ -44,3 +58,11 @@ function handleSubmit() {
 NewOrg.propTypes = {
   addUser: PropTypes.func.isRequired
 }
+
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit
+  },
+});
+
+export default withStyles(styles)(NewOrg);

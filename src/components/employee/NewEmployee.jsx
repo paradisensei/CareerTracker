@@ -5,7 +5,11 @@ import {
   EMPLOYEE
 } from '../../constants/roles';
 
-export default class NewEmployee extends React.Component {
+import { withStyles } from 'material-ui/styles';
+import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+
+class NewEmployee extends React.Component {
 
   constructor(props) {
     super(props);
@@ -13,21 +17,32 @@ export default class NewEmployee extends React.Component {
   }
 
   render() {
+    const { classes, back } = this.props;
+
     return (
       <form>
-        <fieldset>
-          <input type='text' name='name' placeholder='Имя:'
-                 onChange={this.handleInputChange}/>
-          <input type='text' name='email' placeholder='Email:'
-                 onChange={this.handleInputChange}/>
-          <input type='text' name='city' placeholder='Город:'
-                 onChange={this.handleInputChange}/>
-          <input type='number' name='passport' placeholder='Паспорт:'
-                 onChange={this.handleInputChange}/>
-          <input type='text' name='profession' placeholder='Профессия:'
-                 onChange={this.handleInputChange}/>
-          <button onClick={handleSubmit.bind(this)}>Submit</button>
-        </fieldset>
+        <TextField label='ФИО' name='name'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='Email' name='email'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='Город' name='city'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='№ паспорта' name='passport'
+                   onChange={this.handleInputChange}/>
+
+        <TextField label='Профессия' name='profession'
+                   onChange={this.handleInputChange}/>
+
+        <Button color="primary" className={classes.button}
+                onClick={handleSubmit.bind(this)}>
+          Создать!
+        </Button>
+        <Button color="accent" className={classes.button} onClick={back}>
+          Назад
+        </Button>
       </form>
     );
   }
@@ -46,3 +61,11 @@ function handleSubmit() {
 NewEmployee.propTypes = {
   addUser: PropTypes.func.isRequired
 }
+
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit
+  },
+});
+
+export default withStyles(styles)(NewEmployee);

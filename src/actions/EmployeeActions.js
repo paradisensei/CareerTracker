@@ -36,7 +36,7 @@ export const setOffers = () =>
         offers.push({
           orgName: org[0],
           position: o[1],
-          date: getDate(new Date(Number(o[2]))),
+          date: getDate(new Date(o[2] * 1000)),
           index: i
         });
       }
@@ -57,14 +57,14 @@ export const considerOffer = (index, approve) =>
     const address = getState().user.info.address;
     const offers = getState().employee.offers;
 
-    // update offers
-    dispatch({
-      type: SET_OFFERS,
-      offers: offers.filter(o => o.index !== index)
-    });
-
     contract.methods.considerOffer(index, approve)
-      .send({from: address}, (e, result) => {});
+      .send({from: address})
+      .on('transactionHash', hash =>
+        dispatch({
+          type: SET_OFFERS,
+          offers: offers.filter(o => o.index !== index)
+        })
+      );
   }
 
 export const setCareerProfile = () =>

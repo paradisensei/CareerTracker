@@ -28,7 +28,7 @@ const Professional = ({ classes, prof, makeOffer }) =>
         </Typography>
         <Button color="accent"
                 className={classes.button}
-                onClick={makeOffer.bind(null, prof.address)}>
+                onClick={makeOffer.bind(null, prof)}>
           Сделать оффер
         </Button>
       </CardContent>

@@ -11,10 +11,6 @@ import {
 export const addUser = (user, role) =>
   (dispatch, getState) => {
 
-    dispatch({
-      type: ADD_USER_PENDING
-    });
-
     const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
 
@@ -35,13 +31,17 @@ export const addUser = (user, role) =>
       }
 
       method.send({from: address})
-        .then(
-          receipt =>
-            dispatch({
-              type: ADDED_USER,
-              info: Assign(user, { address: address, role:role  })
-            })
+        .on('transactionHash', hash =>
+          dispatch({
+            type: ADD_USER_PENDING
+          })
         )
+        .on('receipt', receipt =>
+          dispatch({
+            type: ADDED_USER,
+            info: Assign(user, { address: address, role:role  })
+          })
+        );
         //TODO add error handling
     });
 

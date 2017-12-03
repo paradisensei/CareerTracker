@@ -42,7 +42,6 @@ class Employee extends React.Component {
         <p><i>Профессия : </i>{user.profession}</p>
         <p><i>Город : </i>{user.city}</p>
         <p><i>Паспортные данные : </i>{user.passport}</p>
-
         {body}
       </div>
     );

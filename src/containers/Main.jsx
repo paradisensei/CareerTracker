@@ -12,14 +12,15 @@ import EmployeeMenu from '../components/employee/EmployeeMenu';
 import OrgMenu from '../components/org/OrgMenu';
 
 import { withStyles } from 'material-ui/styles';
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import Drawer from 'material-ui/Drawer';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 
-
 const Main = ({ classes, user, children }) => {
+
   let menu = null;
   if (user.info) {
     switch (user.info.role) {
@@ -33,31 +34,34 @@ const Main = ({ classes, user, children }) => {
         //TODO
     }
   }
+
   return (
-    <div className={classes.main}>
-      <div className={classes.appFrame}>
-        <AppBar className={classes.appBar}>
-          <Toolbar>
-            <Typography type='title' color='inherit' noWrap>
-              Career tracker
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          type='permanent'
-          classes={{
-            paper: classes.drawerPaper,
-          }}
-        >
-          <div className={classes.drawerHeader}/>
-          <Divider/>
-          {menu}
-        </Drawer>
-        <main className={classes.content}>
-          {children}
-        </main>
+    <MuiThemeProvider theme={theme}>
+      <div className={classes.main}>
+        <div className={classes.appFrame}>
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+              <Typography type='title' className={classes.title} noWrap>
+                Career tracker
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            type='permanent'
+            classes={{
+              paper: classes.drawerPaper,
+            }}
+          >
+            <div className={classes.drawerHeader}/>
+            <Divider/>
+            {menu}
+          </Drawer>
+          <main className={classes.content}>
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </MuiThemeProvider>
   )
 };
 
@@ -67,6 +71,28 @@ Main.propTypes = {
 
 const mapStateToProps = (state) => ({
   user: state.user
+});
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      50: '#E0F7FA',
+      100: '#B2EBF2',
+      200: '#80DEEA',
+      300: '#4DD0E1',
+      400: '#26C6DA',
+      500: '#00BCD4',
+      600: '#00ACC1',
+      700: '#0097A7',
+      800: '#00838F',
+      900: '#006064',
+      A100: '#84FFFF',
+      A200: '#18FFFF',
+      A400: '#00E5FF',
+      A700: '#00B8D4',
+      contrastDefaultColor: 'pink'
+    }
+  }
 });
 
 const styles = theme => ({
@@ -85,6 +111,9 @@ const styles = theme => ({
     position: 'absolute',
     width: `calc(100% - ${Screen.drawerWidth}px)`,
     marginLeft: Screen.drawerWidth
+  },
+  title: {
+    color: 'white'
   },
   drawerPaper: {
     position: 'relative',

@@ -48,8 +48,8 @@ class Auth extends React.Component {
     if (this.state.child) {
       body = this.state.child;
     } else {
-      const employee = <NewEmployee addUser={addUser}/>
-      const org = <NewOrg addUser={addUser}/>
+      const employee = <NewEmployee addUser={addUser} back={handleBack.bind(this)}/>
+      const org = <NewOrg addUser={addUser} back={handleBack.bind(this)}/>
 
       body = <div>
         <Button color="primary"
@@ -90,6 +90,12 @@ class Auth extends React.Component {
 function handleChoose(child) {
   this.setState({
     child: child
+  });
+}
+
+function handleBack() {
+  this.setState({
+    child: null
   });
 }
 
