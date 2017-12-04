@@ -1,42 +1,60 @@
+import { Assign } from '../lib/util';
 import {
-  SET_EMPLOYEES, SET_PROFESSIONALS
+  SET_EMPLOYEES,
+  SET_PROFESSIONALS
 } from '../constants/actions';
 
+
 export const setEmployees = () =>
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
 
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
 
     // get staff (employees)
-    contract.methods.getStaff().call({from: address})
-      .then(staff => {
-        // get information about staff (employees)
-        let promises = [];
-        staff.forEach(e =>
-          promises.push(contract.methods.employeeInfo(e).call())
-        );
-        return Promise.all(promises);
-      })
-      .then(staff => {
-        const employees = [];
+    const staffAddr = await contract.methods.getStaff().call({from: address});
 
-        staff.forEach(e => {
-          employees.push({
-            name: e[0],
-            email: e[1],
-            city: e[2],
-            passport: Number(e[3]),
-            profession: e[4]
-          });
-        })
+    // get information about staff (employees)
+    let promises = [];
+    staffAddr.forEach(e =>
+      promises.push(contract.methods.employeeInfo(e).call())
+    );
+    const empls = await Promise.all(promises);
 
-        // store employees
-        dispatch({
-          type: SET_EMPLOYEES,
-          employees: employees
-        });
-      })
+    // get last employment record for every employee
+    promises = [];
+    staffAddr.forEach(e =>
+      promises.push(contract.methods.getEmpRecordsCount().call({from: e}))
+    );
+    const emplsRecCount = await Promise.all(promises);
+
+    promises = [];
+    staffAddr.forEach((e, i) => {
+      const last = emplsRecCount[i] - 1;
+      promises.push(contract.methods.empRecordsOf(e, last).call());
+    });
+    const emplsRec = await Promise.all(promises);
+
+
+    const employees = [];
+    empls.forEach((e, i) => {
+      const record = emplsRec[i];
+      employees.push({
+        address: staffAddr[i],
+        name: e[0],
+        email: e[1],
+        city: e[2],
+        passport: Number(e[3]),
+        position: record[1],
+        comment: record[3]
+      });
+    })
+
+    // store employees
+    dispatch({
+      type: SET_EMPLOYEES,
+      employees: employees
+    });
 
   };
 
@@ -70,7 +88,7 @@ export const setProfessionals = () =>
       });
     })
 
-    // store employees
+    // store professionals
     dispatch({
       type: SET_PROFESSIONALS,
       professionals: professionals
@@ -93,4 +111,30 @@ export const makeOffer = (prof) =>
           professionals: professionals.filter(p => p.address !== prof.address)
         })
       );
+  }
+
+export const addComment = (address, comment) =>
+  (dispatch, getState) => {
+
+    const contract = getState().contract.instance;
+    const userAddress = getState().user.info.address;
+    const employees = getState().org.employees;
+
+    // if comment is not empty
+    if (comment) {
+      contract.methods.comment(address, comment)
+        .send({from: userAddress})
+        .on('transactionHash', hash => {
+          const updatedEmployees = employees.map(e => {
+            if (e.address === address) {
+              return Assign(e, { comment: comment })
+            }
+            return e;
+          });
+          dispatch({
+            type: SET_EMPLOYEES,
+            employees: updatedEmployees
+          });
+        });
+    }
   }

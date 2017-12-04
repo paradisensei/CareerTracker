@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { setEmployees } from '../../actions/OrgActions';
+import { setEmployees, addComment } from '../../actions/OrgActions';
 
 import Empty from '../../components/util/Empty';
 import OrgEmployee from '../../components/org/OrgEmployee';
@@ -18,18 +18,18 @@ class Org extends React.Component {
   }
 
   render() {
-    const { user, employees } = this.props;
+    const { user, employees, addComment } = this.props;
 
     if (!employees) {
       return <Empty/>
     }
 
-    let body = null;
+    let body = 'Здесь будут отображаться ваши сотрудники, которых пока нет :)';
     if (employees.length > 0) {
       body = <div>
         <h2>Ваши сотрудники</h2>
         <Grid container spacing={24}>{
-          employees.map(e => <OrgEmployee employee={e}/>)
+          employees.map(e => <OrgEmployee employee={e} addComment={addComment}/>)
         }</Grid>
       </div>
     }
@@ -53,7 +53,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setEmployees: () => dispatch(setEmployees())
+  setEmployees: () => dispatch(setEmployees()),
+  addComment: (address, comment) => dispatch(addComment(address, comment))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Org);

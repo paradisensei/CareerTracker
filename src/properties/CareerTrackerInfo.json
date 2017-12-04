@@ -54,6 +54,24 @@
       "type": "function"
     },
     {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "employee",
+          "type": "address"
+        },
+        {
+          "name": "comment",
+          "type": "string"
+        }
+      ],
+      "name": "comment",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "constant": true,
       "inputs": [],
       "name": "getStaff",
@@ -154,20 +172,6 @@
     {
       "constant": true,
       "inputs": [],
-      "name": "getCurrentEmployer",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
       "name": "getEmpRecordsCount",
       "outputs": [
         {
@@ -204,6 +208,10 @@
         {
           "name": "timestamp",
           "type": "uint256"
+        },
+        {
+          "name": "comment",
+          "type": "string"
         },
         {
           "name": "status",
@@ -374,5 +382,5 @@
       "type": "function"
     }
   ],
-  "address": "0x567fE4D3520738744D0915e556C6515AcEf96B40"
+  "address": "0xCA9b925dE48887Ac7250C78194E65f3E5d84117a"
 }

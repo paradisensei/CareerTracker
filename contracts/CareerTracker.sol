@@ -35,6 +35,7 @@ contract CareerTracker {
         address org;
         string position;
         uint timestamp;
+        string comment;
         EmploymentStatus status;
     }
 
@@ -59,7 +60,6 @@ contract CareerTracker {
     // organization address -> organization's employees
     mapping (address => address[]) public employeesOf;
 
-    //TODO verify employee's identity
     /// Add new employee
     function newEmployee(
         string _name,
@@ -82,7 +82,6 @@ contract CareerTracker {
         employees.push(msg.sender);
     }
 
-    //TODO verify organization's identity
     /// Add new organization
     function newOrg(
         string _name,
@@ -142,16 +141,15 @@ contract CareerTracker {
         }
     }
 
-    /// Get current employer
-    function getCurrentEmployer() public constant returns (address) {
-        uint last = empRecordsOf[msg.sender].length - 1;
-        EmpRecord memory lastRecord = empRecordsOf[msg.sender][last];
+    /// Add recommendation comment for your employee
+    function comment(address employee, string comment) public {
+        uint last = empRecordsOf[employee].length - 1;
+        EmpRecord storage record = empRecordsOf[employee][last];
 
-        if (lastRecord.status != EmploymentStatus.In) {
-            return address(0);
-        } else {
-            return lastRecord.org;
-        }
+        // check employee's org
+        require(msg.sender == record.org);
+        // create or update recommendation comment
+        record.comment = comment;
     }
 
     /// Get organization's employees' addresses

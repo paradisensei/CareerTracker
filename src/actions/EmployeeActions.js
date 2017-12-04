@@ -4,6 +4,7 @@ import {
 } from "../constants/actions";
 import getDate from '../lib/getDate';
 
+
 export const setOffers = () =>
   async (dispatch, getState) => {
 
@@ -94,8 +95,9 @@ export const setCareerProfile = () =>
       careerProfile.push({
         orgName: org[0],
         position: r[1],
-        date: getDate(new Date(Number(r[2]))),
-        status: r[3]
+        date: getDate(new Date(r[2] * 1000)),
+        comment: r[3],
+        status: r[4]
       });
     })
 
