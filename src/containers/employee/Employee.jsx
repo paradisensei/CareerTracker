@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { History } from '../../store/index';
 
 import { setOffers, considerOffer } from '../../actions/EmployeeActions';
 
@@ -10,18 +11,17 @@ import List from 'material-ui/List';
 
 class Employee extends React.Component {
 
-  componentWillMount() {
-    // check whether user's offers are already set
-    if (!this.props.offers) {
-      this.props.setOffers();
-    }
-  }
-
   render() {
-    const { user, offers, considerOffer } = this.props;
+    const { user, offers, setOffers, considerOffer } = this.props;
+
+    if (!user.set) {
+      History.push('/');
+      return null;
+    }
 
     if (!offers) {
-      return <Empty/>
+      setOffers();
+      return <Empty/>;
     }
 
     let body = null;
@@ -34,14 +34,15 @@ class Employee extends React.Component {
       </div>
     }
 
+    const userInfo = user.info;
     return (
       <div>
         <h1>Ваш профиль</h1>
-        <p><i>ФИО : </i>{user.name}</p>
-        <p><i>Email : </i>{user.email}</p>
-        <p><i>Профессия : </i>{user.profession}</p>
-        <p><i>Город : </i>{user.city}</p>
-        <p><i>Паспортные данные : </i>{user.passport}</p>
+        <p><i>ФИО : </i>{userInfo.name}</p>
+        <p><i>Email : </i>{userInfo.email}</p>
+        <p><i>Профессия : </i>{userInfo.profession}</p>
+        <p><i>Город : </i>{userInfo.city}</p>
+        <p><i>Паспортные данные : </i>{userInfo.passport}</p>
         {body}
       </div>
     );
@@ -49,7 +50,7 @@ class Employee extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user.info,
+  user: state.user,
   offers: state.employee.offers
 });
 

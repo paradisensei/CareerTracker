@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { History } from '../../store/index';
 
 import { setEmployees, addComment } from '../../actions/OrgActions';
 
@@ -10,17 +11,16 @@ import Grid from 'material-ui/Grid';
 
 class Org extends React.Component {
 
-  componentWillMount() {
-    // check whether org's employees are already set
-    if (!this.props.employees) {
-      this.props.setEmployees();
-    }
-  }
-
   render() {
-    const { user, employees, addComment } = this.props;
+    const { user, employees, setEmployees, addComment } = this.props;
+
+    if (!user.set) {
+      History.push('/');
+      return null;
+    }
 
     if (!employees) {
+      setEmployees();
       return <Empty/>
     }
 
@@ -34,13 +34,14 @@ class Org extends React.Component {
       </div>
     }
 
+    const userInfo = user.info;
     return (
       <div>
         <h1>Ваш профиль</h1>
-        <p><i>Название : </i>{user.name}</p>
-        <p><i>Город : </i>{user.city}</p>
-        <p><i>Инн : </i>{user.inn}</p>
-        <p><i>Сфера деятельности : </i>{user.sphere}</p>
+        <p><i>Название : </i>{userInfo.name}</p>
+        <p><i>Город : </i>{userInfo.city}</p>
+        <p><i>Инн : </i>{userInfo.inn}</p>
+        <p><i>Сфера деятельности : </i>{userInfo.sphere}</p>
         {body}
       </div>
     );
@@ -48,7 +49,7 @@ class Org extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  user: state.user.info,
+  user: state.user,
   employees: state.org.employees
 });
 

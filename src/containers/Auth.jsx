@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { History } from '../store/index';
 import { compose } from '../lib/util';
 
-import { setUser } from '../actions/EntrypointActions';
 import { addUser } from '../actions/AuthActions';
 
 import NewEmployee from '../components/employee/NewEmployee';
@@ -22,19 +21,11 @@ class Auth extends React.Component {
     this.state = {};
   }
 
-  componentWillMount() {
-    // check whether user is already set
-    if (!this.props.user.set) {
-      this.props.setUser();
-    }
-  }
-
   render() {
     const { user, classes, addUser } = this.props;
 
-    // redirect to home page if user already has account
-    if (user.info) {
-      History.push('/home');
+    if (!user.set) {
+      History.push('/');
       return null;
     }
 
@@ -104,7 +95,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  setUser: () => dispatch(setUser()),
   addUser: (user, role) => dispatch(addUser(user, role))
 });
 

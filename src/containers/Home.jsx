@@ -2,33 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { History } from '../store/index';
 
-import { setUser } from '../actions/EntrypointActions';
-
 import {
   EMPLOYEE, ORG
 } from '../constants/roles';
 
-import Empty from '../components/util/Empty';
-
 class Home extends React.Component {
-
-  componentWillMount() {
-    // check whether user is already set
-    if (!this.props.user.set) {
-      this.props.setUser();
-    }
-  }
 
   render() {
     const user = this.props.user;
 
     if (!user.set) {
-      return <Empty/>
-    }
-
-    // redirect to auth page if user has no account yet
-    if (!user.info) {
-      History.push('/auth');
+      History.push('/');
       return null;
     }
 
@@ -52,8 +36,4 @@ const mapStateToProps = (state) => ({
   user: state.user
 });
 
-const mapDispatchToProps = dispatch => ({
-  setUser: () => dispatch(setUser()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps)(Home);
