@@ -1,0 +1,1 @@
+export const IPFS_API_SERVER = '';

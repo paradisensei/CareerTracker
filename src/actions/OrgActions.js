@@ -119,22 +119,30 @@ export const addComment = (address, comment) =>
     const contract = getState().contract.instance;
     const userAddress = getState().user.info.address;
     const employees = getState().org.employees;
+    const ipfs = getState().ipfs.api;
 
     // if comment is not empty
     if (comment) {
-      contract.methods.comment(address, comment)
-        .send({from: userAddress})
-        .on('transactionHash', hash => {
-          const updatedEmployees = employees.map(e => {
-            if (e.address === address) {
-              return Assign(e, { comment: comment })
-            }
-            return e;
+      // save comment to IPFS & receive its hash in return
+      const commentBuf = Buffer.from(comment, 'utf8');
+      ipfs.files.add(commentBuf, (err, files) => {
+        const commentHash = files[0].hash;
+
+        // save comment's hash to blockchain
+        contract.methods.comment(address, commentHash)
+          .send({from: userAddress})
+          .on('transactionHash', hash => {
+            const updatedEmployees = employees.map(e => {
+              if (e.address === address) {
+                return Assign(e, { comment: comment })
+              }
+              return e;
+            });
+            dispatch({
+              type: SET_EMPLOYEES,
+              employees: updatedEmployees
+            });
           });
-          dispatch({
-            type: SET_EMPLOYEES,
-            employees: updatedEmployees
-          });
-        });
+      });
     }
   }

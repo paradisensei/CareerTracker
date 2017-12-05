@@ -73,6 +73,7 @@ export const setCareerProfile = () =>
 
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
+    const ipfs = getState().ipfs.api;
 
     // get employment records
     const count = await contract.methods.getEmpRecordsCount().call({from: address});
@@ -83,20 +84,27 @@ export const setCareerProfile = () =>
     }
     const allEmpRecords = await Promise.all(promises);
 
+    // fetch actual recommendation comments from IPFS
+    promises = allEmpRecords.map(r => fetchComment(ipfs, r[3]));
+    const comments = await Promise.all(promises);
+
+    // get associated organizations
     promises = [];
-    allEmpRecords.forEach(r => {
-      promises.push(contract.methods.orgInfo(r[0]).call());
-    });
+    allEmpRecords.forEach(r =>
+      promises.push(contract.methods.orgInfo(r[0]).call())
+    );
     const orgs = await Promise.all(promises);
 
     const careerProfile = [];
     allEmpRecords.forEach((r, i) => {
-      const org = orgs[i];
+      const org = orgs[i][0];
+      const comment = comments[i];
+
       careerProfile.push({
-        orgName: org[0],
+        orgName: org,
         position: r[1],
         date: getDate(new Date(r[2] * 1000)),
-        comment: r[3],
+        comment: comment,
         status: r[4]
       });
     })
@@ -107,3 +115,16 @@ export const setCareerProfile = () =>
       careerProfile: careerProfile
     });
   }
+
+const fetchComment = (ipfs, hash) => new Promise((resolve, reject) => {
+  ipfs.files.cat(hash, (err, file) => {
+    // read file stream by chunks
+    const chunks = [];
+
+    file.on('data', chunks.push.bind(chunks));
+
+    file.on('end', () =>
+      resolve(Buffer.concat(chunks).toString())
+    );
+  });
+});

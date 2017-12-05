@@ -7,6 +7,12 @@ const EmployeeRecord = ({ record }) => {
   const status = Number(record.status);
   const text = status === 0 ? 'приняты на должность'
     : 'уволены с должности';
+  const comment = status === 0 ?
+    <ListItem>
+      <ListItemText primary={`Рекомендация работодателя: ${record.comment}`}/>
+    </ListItem>
+    : null;
+
   return (
     <div>
       <ListItem>
@@ -14,9 +20,7 @@ const EmployeeRecord = ({ record }) => {
           `${record.date} вы были ${text} ${record.position} в ${record.orgName}`
         }/>
       </ListItem>
-      <ListItem>
-        <ListItemText primary={`Рекомендация работодателя: ${record.comment}`}/>
-      </ListItem>
+      {comment}
       <Divider/>
     </div>
   );
