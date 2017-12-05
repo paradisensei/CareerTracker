@@ -16,6 +16,11 @@ class Home extends React.Component {
       return null;
     }
 
+    if (!user.info) {
+      History.push('/auth');
+      return null;
+    }
+
     switch (user.info.role) {
       case EMPLOYEE:
         History.push('/home/employee');

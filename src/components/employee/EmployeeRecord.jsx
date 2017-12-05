@@ -7,7 +7,7 @@ const EmployeeRecord = ({ record }) => {
   const status = Number(record.status);
   const text = status === 0 ? 'приняты на должность'
     : 'уволены с должности';
-  const comment = status === 0 ?
+  const comment = record.comment ?
     <ListItem>
       <ListItemText primary={`Рекомендация работодателя: ${record.comment}`}/>
     </ListItem>

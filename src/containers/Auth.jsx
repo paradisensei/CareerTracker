@@ -29,6 +29,11 @@ class Auth extends React.Component {
       return null;
     }
 
+    if (user.info) {
+      History.push('/home');
+      return null;
+    }
+
     // return spinner if user's account is currently being added to blockchain
     if (user.pending) {
       return <Empty/>

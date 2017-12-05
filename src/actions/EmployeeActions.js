@@ -117,6 +117,9 @@ export const setCareerProfile = () =>
   }
 
 const fetchComment = (ipfs, hash) => new Promise((resolve, reject) => {
+  if (!hash) {
+    resolve(null);
+  }
   ipfs.files.cat(hash, (err, file) => {
     // read file stream by chunks
     const chunks = [];
