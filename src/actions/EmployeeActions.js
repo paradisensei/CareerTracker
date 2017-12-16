@@ -1,8 +1,9 @@
+import fetchUserFromIPFS from '../lib/fetchUserFromIPFS';
+import getDate from '../lib/getDate';
 import {
   SET_OFFERS,
   SET_CAREER_PROFILE
 } from "../constants/actions";
-import getDate from '../lib/getDate';
 
 
 export const setOffers = () =>
@@ -10,6 +11,7 @@ export const setOffers = () =>
 
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
+    const ipfs = getState().ipfs.api;
 
     // get all offers with 'No' status
     const count = await contract.methods.getOffersCount().call({from: address});
@@ -28,6 +30,14 @@ export const setOffers = () =>
         promises.push(Promise.resolve(null));
       }
     });
+    const orgHashes = await Promise.all(promises);
+
+    // fetch organizations' info from IPFS
+    promises = [];
+    orgHashes.forEach(hash => {
+      promises.push(fetchUserFromIPFS(ipfs, hash))
+      }
+    );
     const orgs = await Promise.all(promises);
 
     const offers = [];
@@ -35,7 +45,7 @@ export const setOffers = () =>
       const org = orgs[i];
       if (org) {
         offers.push({
-          orgName: org[0],
+          orgName: org.name,
           position: o[1],
           date: getDate(new Date(o[2] * 1000)),
           index: i
@@ -88,16 +98,23 @@ export const setCareerProfile = () =>
     promises = allEmpRecords.map(r => fetchComment(ipfs, r[3]));
     const comments = await Promise.all(promises);
 
-    // get associated organizations
+    // get associated organizations's hashes
     promises = [];
     allEmpRecords.forEach(r =>
       promises.push(contract.methods.orgInfo(r[0]).call())
+    );
+    const orgHashes = await Promise.all(promises);
+
+    // fetch organizations' info from IPFS
+    promises = [];
+    orgHashes.forEach(hash =>
+      promises.push(fetchUserFromIPFS(ipfs, hash))
     );
     const orgs = await Promise.all(promises);
 
     const careerProfile = [];
     allEmpRecords.forEach((r, i) => {
-      const org = orgs[i][0];
+      const org = orgs[i].name;
       const comment = comments[i];
 
       careerProfile.push({
@@ -120,14 +137,7 @@ const fetchComment = (ipfs, hash) => new Promise((resolve, reject) => {
   if (!hash) {
     resolve(null);
   }
-  ipfs.files.cat(hash, (err, file) => {
-    // read file stream by chunks
-    const chunks = [];
-
-    file.on('data', chunks.push.bind(chunks));
-
-    file.on('end', () =>
-      resolve(Buffer.concat(chunks).toString())
-    );
+  ipfs.files.get(hash, (err, files) => {
+    resolve(files[0].content.toString());
   });
 });

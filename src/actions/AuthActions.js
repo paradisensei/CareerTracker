@@ -9,40 +9,52 @@ import {
 
 
 export const addUser = (user, role) =>
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
 
     const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
+    const ipfs = getState().ipfs.api;
 
-    // Add new user
-    web3.eth.getAccounts().then(accounts => {
-      const address = accounts[0];
+    // get current user
+    const accounts = await web3.eth.getAccounts();
+    const address = accounts[0];
 
-      let method;
-      switch (role) {
-        case EMPLOYEE:
-          method = contract.methods.newEmployee(...Object.values(user));
-          break;
-        case ORG:
-          method = contract.methods.newOrg(...Object.values(user));
-          break;
-        default:
-          //TODO
+    // save raw user info to IPFS & receive its hash in return
+    const hash = await saveUserToIPFS(user, ipfs);
+
+    // construct necessary method based on user type
+    let method;
+    if (role === EMPLOYEE) {
+      method = contract.methods.newEmployee(hash);
+    } else if (role === ORG) {
+      method = contract.methods.newOrg(hash);
+    }
+
+    method.send({from: address})
+      .on('transactionHash', hash =>
+        dispatch({
+          type: ADD_USER_PENDING
+        })
+      )
+      .on('receipt', receipt =>
+        dispatch({
+          type: ADDED_USER,
+          info: Assign(user, { address: address, role:role  })
+        })
+      );
+      //TODO add error handling
+    }
+
+const saveUserToIPFS = (user, ipfs) => {
+  const userBuf = Buffer.from(JSON.stringify(user), 'utf8');
+
+  return new Promise((resolve, reject) => {
+    ipfs.files.add(userBuf, (err, files) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(files[0].hash);
       }
-
-      method.send({from: address})
-        .on('transactionHash', hash =>
-          dispatch({
-            type: ADD_USER_PENDING
-          })
-        )
-        .on('receipt', receipt =>
-          dispatch({
-            type: ADDED_USER,
-            info: Assign(user, { address: address, role:role  })
-          })
-        );
-        //TODO add error handling
     });
-
-  };
+  });
+}

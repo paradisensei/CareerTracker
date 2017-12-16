@@ -1,138 +1,6 @@
 {
   "abi": [
     {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "employee",
-          "type": "address"
-        },
-        {
-          "name": "position",
-          "type": "string"
-        }
-      ],
-      "name": "makeOffer",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "address"
-        },
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "offersOf",
-      "outputs": [
-        {
-          "name": "org",
-          "type": "address"
-        },
-        {
-          "name": "position",
-          "type": "string"
-        },
-        {
-          "name": "timestamp",
-          "type": "uint256"
-        },
-        {
-          "name": "status",
-          "type": "uint8"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "employee",
-          "type": "address"
-        },
-        {
-          "name": "comment",
-          "type": "string"
-        }
-      ],
-      "name": "comment",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getStaff",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getOffersCount",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "employees",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getEmployees",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "constant": true,
       "inputs": [
         {
@@ -145,38 +13,6 @@
         {
           "name": "",
           "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "index",
-          "type": "uint256"
-        },
-        {
-          "name": "approve",
-          "type": "bool"
-        }
-      ],
-      "name": "considerOffer",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [],
-      "name": "getEmpRecordsCount",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
         }
       ],
       "payable": false,
@@ -230,22 +66,10 @@
           "type": "address"
         }
       ],
-      "name": "orgInfo",
+      "name": "employeeInfo",
       "outputs": [
         {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "city",
-          "type": "string"
-        },
-        {
-          "name": "inn",
-          "type": "uint32"
-        },
-        {
-          "name": "sphere",
+          "name": "",
           "type": "string"
         }
       ],
@@ -254,33 +78,22 @@
       "type": "function"
     },
     {
-      "constant": false,
+      "constant": true,
       "inputs": [
         {
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "name": "_email",
-          "type": "string"
-        },
-        {
-          "name": "_city",
-          "type": "string"
-        },
-        {
-          "name": "_passport",
-          "type": "uint32"
-        },
-        {
-          "name": "_profession",
-          "type": "string"
+          "name": "",
+          "type": "uint256"
         }
       ],
-      "name": "newEmployee",
-      "outputs": [],
+      "name": "employees",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
       "payable": false,
-      "stateMutability": "nonpayable",
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -289,59 +102,33 @@
         {
           "name": "",
           "type": "address"
+        },
+        {
+          "name": "",
+          "type": "uint256"
         }
       ],
-      "name": "employeeInfo",
+      "name": "offersOf",
       "outputs": [
         {
-          "name": "name",
+          "name": "org",
+          "type": "address"
+        },
+        {
+          "name": "position",
           "type": "string"
         },
         {
-          "name": "email",
-          "type": "string"
+          "name": "timestamp",
+          "type": "uint256"
         },
         {
-          "name": "city",
-          "type": "string"
-        },
-        {
-          "name": "passport",
-          "type": "uint32"
-        },
-        {
-          "name": "profession",
-          "type": "string"
+          "name": "status",
+          "type": "uint8"
         }
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "name": "_city",
-          "type": "string"
-        },
-        {
-          "name": "_inn",
-          "type": "uint32"
-        },
-        {
-          "name": "_sphere",
-          "type": "string"
-        }
-      ],
-      "name": "newOrg",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -352,6 +139,53 @@
         {
           "name": "",
           "type": "address[]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "orgInfo",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getEmployees",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getEmpRecordsCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
         }
       ],
       "payable": false,
@@ -380,7 +214,117 @@
       "payable": false,
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getStaff",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getOffersCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "employee",
+          "type": "address"
+        },
+        {
+          "name": "comment",
+          "type": "string"
+        }
+      ],
+      "name": "comment",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "name": "approve",
+          "type": "bool"
+        }
+      ],
+      "name": "considerOffer",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "org",
+          "type": "string"
+        }
+      ],
+      "name": "newOrg",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "employee",
+          "type": "string"
+        }
+      ],
+      "name": "newEmployee",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "employee",
+          "type": "address"
+        },
+        {
+          "name": "position",
+          "type": "string"
+        }
+      ],
+      "name": "makeOffer",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
-  "address": "0xe628eC399c8e7F596D6113914c3c6c04c9100477"
+  "address": "0x425A928333e8db477be3C6823b1f2D3c4869038a"
 }

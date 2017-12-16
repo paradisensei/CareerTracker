@@ -1,4 +1,5 @@
 import { Assign } from '../lib/util';
+import fetchUserFromIPFS from '../lib/fetchUserFromIPFS';
 import {
   SET_EMPLOYEES,
   SET_PROFESSIONALS
@@ -10,14 +11,22 @@ export const setEmployees = () =>
 
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
+    const ipfs = getState().ipfs.api;
 
     // get staff (employees)
     const staffAddr = await contract.methods.getStaff().call({from: address});
 
-    // get information about staff (employees)
+    // get hashes of staff members (employees)
     let promises = [];
     staffAddr.forEach(e =>
       promises.push(contract.methods.employeeInfo(e).call())
+    );
+    const empHashes = await Promise.all(promises);
+
+    // fetch users' info from IPFS
+    promises = [];
+    empHashes.forEach(hash =>
+      promises.push(fetchUserFromIPFS(ipfs, hash))
     );
     const empls = await Promise.all(promises);
 
@@ -35,19 +44,13 @@ export const setEmployees = () =>
     });
     const emplsRec = await Promise.all(promises);
 
-
     const employees = [];
     empls.forEach((e, i) => {
       const record = emplsRec[i];
-      employees.push({
-        address: staffAddr[i],
-        name: e[0],
-        email: e[1],
-        city: e[2],
-        passport: Number(e[3]),
-        position: record[1],
-        comment: record[3]
+      const employee = Assign(e, {
+        address: staffAddr[i], position: record[1], comment: record[3]
       });
+      employees.push(employee);
     })
 
     // store employees
@@ -63,29 +66,31 @@ export const setProfessionals = () =>
 
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
+    const ipfs = getState().ipfs.api;
 
     // get all employees' & staff' (employees) addresses
     const employees = await contract.methods.getEmployees().call();
     const staff = await contract.methods.getStaff().call({from: address});
     const profsAddr = employees.filter(e => !staff.includes(e));
 
-    // get information about professionals
+    // get hashes of professionals
     let promises = [];
     profsAddr.forEach(p =>
       promises.push(contract.methods.employeeInfo(p).call())
+    );
+    const profHashes = await Promise.all(promises);
+
+    // fetch professionals' info from IPFS
+    promises = [];
+    profHashes.forEach(hash =>
+      promises.push(fetchUserFromIPFS(ipfs, hash))
     );
     const profs = await Promise.all(promises);
 
     const professionals = [];
     profs.forEach((p, i) => {
-      professionals.push({
-        address: profsAddr[i],
-        name: p[0],
-        email: p[1],
-        city: p[2],
-        passport: Number(p[3]),
-        profession: p[4]
-      });
+      const prof = Assign(p, { address: profsAddr[i] });
+      professionals.push(prof);
     })
 
     // store professionals

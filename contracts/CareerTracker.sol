@@ -3,23 +3,6 @@ pragma solidity ^0.4.18;
 //* @title A contract to track career. */
 contract CareerTracker {
 
-    // This is a type for a single employee.
-    struct Employee {
-        string name;
-        string email;
-        string city;
-        uint32 passport;
-        string profession;
-    }
-
-    // This is a type for a single organization.
-    struct Org {
-        string name;
-        string city;
-        uint32 inn;
-        string sphere;
-    }
-
     // This is a type for a single offer.
     struct Offer {
         address org;
@@ -41,13 +24,13 @@ contract CareerTracker {
 
     enum EmploymentStatus { In, Out, Fired }
 
-    // employee's address -> employee's information
-    mapping (address => Employee) public employeeInfo;
+    // employee's address -> hash of employee's information on IPFS
+    mapping (address => string) public employeeInfo;
     // A dynamically-sized array containing employees' addresses
     address[] public employees;
 
-    // organization's address -> organization's information
-    mapping (address => Org) public orgInfo;
+    // organization's address -> hash of organization's information on IPFS
+    mapping (address => string) public orgInfo;
     // A dynamically-sized array containing organizations' addresses
     address[] public orgs;
 
@@ -60,45 +43,21 @@ contract CareerTracker {
     // organization address -> organization's employees
     mapping (address => address[]) public employeesOf;
 
-    /// Add new employee
-    function newEmployee(
-        string _name,
-        string _email,
-        string _city,
-        uint32 _passport,
-        string _profession
-    )
-        public
-    {
-        require(employeeInfo[msg.sender].passport == 0);
+    modifier newUser() {
+        require(bytes(employeeInfo[msg.sender]).length == 0);
+        require(bytes(orgInfo[msg.sender]).length == 0);
+        _;
+    }
 
-        employeeInfo[msg.sender] = Employee({
-            name: _name,
-            email: _email,
-            city: _city,
-            passport: _passport,
-            profession: _profession
-        });
+    /// Add new employee
+    function newEmployee(string employee) public newUser {
+        employeeInfo[msg.sender] = employee;
         employees.push(msg.sender);
     }
 
     /// Add new organization
-    function newOrg(
-        string _name,
-        string _city,
-        uint32 _inn,
-        string _sphere
-    )
-        public
-    {
-        require(orgInfo[msg.sender].inn == 0);
-
-        orgInfo[msg.sender] = Org({
-            name: _name,
-            city: _city,
-            inn: _inn,
-            sphere: _sphere
-        });
+    function newOrg(string org) public newUser {
+        orgInfo[msg.sender] = org;
         orgs.push(msg.sender);
     }
 
@@ -133,6 +92,7 @@ contract CareerTracker {
                 org: offer.org,
                 position: offer.position,
                 timestamp: now,
+                comment: '',
                 status: EmploymentStatus.In
             }));
             employeesOf[offer.org].push(msg.sender);

@@ -1,3 +1,5 @@
+import { Assign } from '../lib/util';
+import fetchUserFromIPFS from '../lib/fetchUserFromIPFS';
 import {
   SET_USER
 } from "../constants/actions";
@@ -7,51 +9,35 @@ import {
 
 
 export const setUser = () =>
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
 
     const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
+    const ipfs = getState().ipfs.api;
 
-    // Find current user
-    let account;
+    // get current user's address
+    const accounts = await web3.eth.getAccounts();
+    const address = accounts[0];
+
     let user = null;
-    web3.eth.getAccounts()
-      .then(accounts => {
-        account = accounts[0];
-        return Promise.all([
-          contract.methods.employeeInfo(account).call(),
-          contract.methods.orgInfo(account).call()
-        ]);
-      })
-      .then(([employee, org]) => {
-        // check if employee or org
-        if (employee[1]) {
-          user = {
-            address: account,
-            role: EMPLOYEE,
-            name: employee[0],
-            email: employee[1],
-            city: employee[2],
-            passport: Number(employee[3]),
-            profession: employee[4]
-          }
-        } else if (org[0]) {
-          user = {
-            address: account,
-            role: ORG,
-            name: org[0],
-            city: org[1],
-            inn: org[2],
-            sphere: org[3]
-          };
-        }
 
-        // dispatch action & update state
-        dispatch({
-          type: SET_USER,
-          info: user
-        });
-      })
-      .catch(console.log);
+    // check if user has employee account
+    let userHash = await contract.methods.employeeInfo(address).call();
+    if (userHash) {
+      const emp = await fetchUserFromIPFS(ipfs, userHash);
+      user = Assign(emp, { address: address, role: EMPLOYEE });
+    }
 
+    // check if user has organization account
+    userHash = await contract.methods.orgInfo(address).call();
+    if (userHash) {
+      const org = await fetchUserFromIPFS(ipfs, userHash);
+      user = Assign(org, { address: address, role: ORG });
+    }
+
+    // dispatch action & update state
+    dispatch({
+      type: SET_USER,
+      info: user
+    });
   };
