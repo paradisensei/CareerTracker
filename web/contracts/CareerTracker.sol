@@ -1,13 +1,18 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.20;
 
-//* @title A contract to track career. */
+/**
+ * @title CareerTracker
+ * @dev   A contract to track career
+*/
 contract CareerTracker {
 
-    // This is a type for a single offer.
+    // This is a type for a single signed offer.
     struct Offer {
-        address org;
-        string position;
-        uint timestamp;
+        string details;
+        string sig;
+//        address org;
+//        string position;
+//        uint timestamp;
         OfferStatus status;
     }
 

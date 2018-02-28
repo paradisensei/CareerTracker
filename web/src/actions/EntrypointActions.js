@@ -24,15 +24,17 @@ export const setUser = () =>
     // check if user has employee account
     let userHash = await contract.methods.employeeInfo(address).call();
     if (userHash) {
-      const emp = await fetchUserFromIPFS(ipfs, userHash);
-      user = Assign(emp, { address: address, role: EMPLOYEE });
-    }
-
-    // check if user has organization account
-    userHash = await contract.methods.orgInfo(address).call();
-    if (userHash) {
-      const org = await fetchUserFromIPFS(ipfs, userHash);
-      user = Assign(org, { address: address, role: ORG });
+      const ans = await fetchUserFromIPFS(ipfs, userHash);
+      console.log(ans);
+      user = Assign(ans, { address: address, role: EMPLOYEE });
+    } else {
+      // check if user has organization account
+      userHash = await contract.methods.orgInfo(address).call();
+      if (userHash) {
+        const ans = await fetchUserFromIPFS(ipfs, userHash);
+        console.log(ans);
+        user = Assign(ans, { address: address, role: ORG });
+      }
     }
 
     // dispatch action & update state
