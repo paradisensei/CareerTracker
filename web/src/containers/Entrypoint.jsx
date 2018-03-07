@@ -2,7 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { History } from '../store/index';
 
-import { setUser } from '../actions/EntrypointActions';
+import { setUser, setPkey } from '../actions/EntrypointActions';
+
+import PkeyPrompt from '../components/util/PkeyPrompt';
 
 class Entrypoint extends React.Component {
 
@@ -14,7 +16,12 @@ class Entrypoint extends React.Component {
   }
 
   render() {
-    const user = this.props.user;
+    const { user, setPkey } = this.props;
+
+    // check if user's private key is already set
+    if (!user.pkey) {
+      return <PkeyPrompt setPkey={setPkey}/>
+    }
 
     if (user.set) {
       const redirect = user.info ? '/home' : '/auth';
@@ -32,6 +39,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   setUser: () => dispatch(setUser()),
+  setPkey: (pkey) => dispatch(setPkey(pkey))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Entrypoint);

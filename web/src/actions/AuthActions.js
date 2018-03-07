@@ -1,4 +1,8 @@
+import ethUtil from 'ethereumjs-util';
+
 import { Assign } from '../lib/util';
+import { saveUserToIPFS } from "../lib/ipfs";
+
 import {
   ADD_USER_PENDING,
   ADDED_USER
@@ -14,13 +18,17 @@ export const addUser = (user, role) =>
     const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
     const ipfs = getState().ipfs.api;
+    const pkey = getState().user.pkey;
 
     // get current user
     const accounts = await web3.eth.getAccounts();
     const address = accounts[0];
 
+    // get current user's public key
+    const publicKey = ethUtil.bufferToHex(ethUtil.privateToPublic('0x' + pkey));
+
     // save raw user info to IPFS & receive its hash in return
-    const hash = await saveUserToIPFS(user, ipfs);
+    const hash = await saveUserToIPFS(Assign(user, { publicKey: publicKey }), ipfs);
 
     // construct necessary method based on user type
     let method;
@@ -43,18 +51,4 @@ export const addUser = (user, role) =>
         })
       );
       //TODO add error handling
-    }
-
-const saveUserToIPFS = (user, ipfs) => {
-  const userBuf = Buffer.from(JSON.stringify(user), 'utf8');
-
-  return new Promise((resolve, reject) => {
-    ipfs.files.add(userBuf, (err, files) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(files[0].hash);
-      }
-    });
-  });
-}
+    };

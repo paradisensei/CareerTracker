@@ -1,4 +1,4 @@
-import fetchUserFromIPFS from '../lib/fetchUserFromIPFS';
+import { fetchObjectFromIPFS } from "../lib/ipfs";
 import getDate from '../lib/getDate';
 import {
   SET_OFFERS,
@@ -12,19 +12,28 @@ export const setOffers = () =>
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
     const ipfs = getState().ipfs.api;
+    const pkey = getState().user.pkey;
 
-    // get all offers with 'No' status
+    // get number of all user's offers
     const count = await contract.methods.getOffersCount().call({from: address});
 
+    // get all user's offers
     let promises = [];
     for (let i = 0; i < count; i++) {
       promises.push(contract.methods.offersOf(address, i).call())
     }
     const allOffers = await Promise.all(promises);
 
+    // get info about new offers
+    const newOffers = allOffers.filter(o => Number(o['status']) === 0);
+
+    const details = await Promise.all(
+      newOffers.map(o => fetchObjectFromIPFS(ipfs, o['details']))
+    );
+
     promises = [];
-    allOffers.forEach(o => {
-      if (Number(o[3]) === 0) {
+    newOffers.forEach(o => {
+      if (Number(o['status']) === 0) {
         promises.push(contract.methods.orgInfo(o[0]).call());
       } else {
         promises.push(Promise.resolve(null));
@@ -35,7 +44,7 @@ export const setOffers = () =>
     // fetch organizations' info from IPFS
     promises = [];
     orgHashes.forEach(hash => {
-      promises.push(fetchUserFromIPFS(ipfs, hash))
+      promises.push(fetchObjectFromIPFS(ipfs, hash))
       }
     );
     const orgs = await Promise.all(promises);
@@ -51,7 +60,7 @@ export const setOffers = () =>
           index: i
         });
       }
-    })
+    });
 
     // store offers
     dispatch({
@@ -76,7 +85,7 @@ export const considerOffer = (index, approve) =>
           offers: offers.filter(o => o.index !== index)
         })
       );
-  }
+  };
 
 export const setCareerProfile = () =>
   async (dispatch, getState) => {
@@ -108,7 +117,7 @@ export const setCareerProfile = () =>
     // fetch organizations' info from IPFS
     promises = [];
     orgHashes.forEach(hash =>
-      promises.push(fetchUserFromIPFS(ipfs, hash))
+      promises.push(fetchObjectFromIPFS(ipfs, hash))
     );
     const orgs = await Promise.all(promises);
 
@@ -131,7 +140,7 @@ export const setCareerProfile = () =>
       type: SET_CAREER_PROFILE,
       careerProfile: careerProfile
     });
-  }
+  };
 
 const fetchComment = (ipfs, hash) => new Promise((resolve, reject) => {
   if (!hash) {

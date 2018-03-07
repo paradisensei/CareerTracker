@@ -6,13 +6,11 @@ pragma solidity ^0.4.20;
 */
 contract CareerTracker {
 
-    // This is a type for a single signed offer.
     struct Offer {
         string details;
-        string sig;
-//        address org;
-//        string position;
-//        uint timestamp;
+        string orgSig;
+        string empSig;
+        uint timestamp;
         OfferStatus status;
     }
 
@@ -39,7 +37,7 @@ contract CareerTracker {
     // A dynamically-sized array containing organizations' addresses
     address[] public orgs;
 
-    // employee address -> employee's offers
+    // employee/org address -> employee's/org's offers
     mapping (address => Offer[]) public offersOf;
 
     // employee address -> employee's employment history
@@ -67,21 +65,20 @@ contract CareerTracker {
     }
 
     /// Make an offer to particular employee
-    function makeOffer(address employee, string position) public {
-        address[] memory empls = employeesOf[msg.sender];
-        for (uint i = 0; i < empls.length; i++) {
-            require(empls[i] != employee);
-        }
-        offersOf[employee].push(Offer({
-            org: msg.sender,
-            position: position,
+    function makeOffer(address employee, string _details, string _orgSig) public {
+        Offer memory o = Offer({
+            details: _details,
+            orgSig: _orgSig,
+            empSig: '',
             timestamp: now,
             status: OfferStatus.No
-        }));
+        });
+        offersOf[msg.sender].push(o);
+        offersOf[employee].push(o);
     }
 
     /// Make a decision on particular offer
-    function considerOffer(uint index, bool approve) public {
+    function considerOffer(uint index, bool approve, string _empSig) public {
         Offer storage offer = offersOf[msg.sender][index];
         if (approve) {
             EmpRecord[] memory records = empRecordsOf[msg.sender];
@@ -89,9 +86,9 @@ contract CareerTracker {
             // can accept offer only if unemployed
             uint len = records.length;
             if (len > 0) {
-              require(records[len - 1].status != EmploymentStatus.In);
+                require(records[len - 1].status != EmploymentStatus.In);
             }
-
+            offer.empSig = _empSig;
             offer.status = OfferStatus.Approved;
             empRecordsOf[msg.sender].push(EmpRecord({
                 org: offer.org,
@@ -100,21 +97,9 @@ contract CareerTracker {
                 comment: '',
                 status: EmploymentStatus.In
             }));
-            employeesOf[offer.org].push(msg.sender);
         } else {
             offer.status = OfferStatus.Declined;
         }
-    }
-
-    /// Add recommendation comment for your employee
-    function comment(address employee, string comment) public {
-        uint last = empRecordsOf[employee].length - 1;
-        EmpRecord storage record = empRecordsOf[employee][last];
-
-        // check employee's org
-        require(msg.sender == record.org);
-        // create or update recommendation comment
-        record.comment = comment;
     }
 
     /// Get organization's employees' addresses

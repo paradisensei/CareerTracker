@@ -1,7 +1,8 @@
 import { Assign } from '../lib/util';
-import fetchUserFromIPFS from '../lib/fetchUserFromIPFS';
+import { fetchObjectFromIPFS } from "../lib/ipfs";
 import {
-  SET_USER
+  SET_USER,
+  SET_PKEY
 } from "../constants/actions";
 import {
   EMPLOYEE, ORG
@@ -24,14 +25,13 @@ export const setUser = () =>
     // check if user has employee account
     let userHash = await contract.methods.employeeInfo(address).call();
     if (userHash) {
-      const ans = await fetchUserFromIPFS(ipfs, userHash);
-      console.log(ans);
+      const ans = await fetchObjectFromIPFS(ipfs, userHash);
       user = Assign(ans, { address: address, role: EMPLOYEE });
     } else {
       // check if user has organization account
       userHash = await contract.methods.orgInfo(address).call();
       if (userHash) {
-        const ans = await fetchUserFromIPFS(ipfs, userHash);
+        const ans = await fetchObjectFromIPFS(ipfs, userHash);
         console.log(ans);
         user = Assign(ans, { address: address, role: ORG });
       }
@@ -41,5 +41,14 @@ export const setUser = () =>
     dispatch({
       type: SET_USER,
       info: user
+    });
+  };
+
+export const setPkey = (pkey) =>
+  async (dispatch, getState) => {
+    // dispatch action & update state
+    dispatch({
+      type: SET_PKEY,
+      pkey: pkey
     });
   };

@@ -12,7 +12,7 @@ import Button from 'material-ui/Button';
 class NewOrg extends React.Component {
 
   constructor(props) {
-    super(props)
+    super(props);
     this.handleInputChange = handleInputChange.bind(this);
   }
 

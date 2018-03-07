@@ -48,7 +48,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   setProfessionals: () => dispatch(setProfessionals()),
-  makeOffer: (prof) => dispatch(makeOffer(prof))
+  makeOffer: (prof, details) => dispatch(makeOffer(prof, details))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Search);
