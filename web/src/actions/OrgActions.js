@@ -1,13 +1,15 @@
-import ethUtil from 'ethereumjs-util';
-import ethlib from 'eth-lib';
+import ethLib from 'eth-lib';
 
 import { Assign } from '../lib/util';
-import { fetchObjectFromIPFS } from "../lib/ipfs";
+import { fetchUserFromIPFS } from "../lib/ipfs";
 import { encrypt } from "../lib/crypto";
 import {
   SET_EMPLOYEES,
   SET_PROFESSIONALS
 } from '../constants/actions';
+import {
+  CONTRACTS_URL
+} from '../properties/properties';
 
 
 export const setEmployees = () =>
@@ -30,7 +32,7 @@ export const setEmployees = () =>
     // fetch users' info from IPFS
     promises = [];
     empHashes.forEach(hash =>
-      promises.push(fetchObjectFromIPFS(ipfs, hash))
+      promises.push(fetchUserFromIPFS(ipfs, hash))
     );
     const empls = await Promise.all(promises);
 
@@ -87,7 +89,7 @@ export const setProfessionals = () =>
     // fetch professionals' info from IPFS
     promises = [];
     profHashes.forEach(hash =>
-      promises.push(fetchObjectFromIPFS(ipfs, hash))
+      promises.push(fetchUserFromIPFS(ipfs, hash))
     );
     const profs = await Promise.all(promises);
 
@@ -108,42 +110,46 @@ export const setProfessionals = () =>
 export const makeOffer = (prof, details) =>
   (dispatch, getState) => {
     const web3 = getState().web3.instance;
-    const contract = getState().contract.instance;
     const userAddress = getState().user.info.address;
     const professionals = getState().org.professionals;
     const ipfs = getState().ipfs.api;
     const pkey = getState().user.pkey;
 
+    // 1. Sign details hash using org's private key
+    const detailsHex = web3.utils.sha3(JSON.stringify(details));
+    const sig = ethLib.account.sign(detailsHex, '0x' + pkey);
+
+    // 2. Encrypt details using recipient's public key
     const detailsBuf = new Buffer(JSON.stringify(details), 'utf8');
-
-    //  encrypt offer details using recipient's public key
     const encryptedDetails = encrypt(pkey, prof.publicKey, detailsBuf);
+    const encryptedDetailsBuf = new Buffer(encryptedDetails, 'hex');
 
-    console.log(ethUtil.bufferToHex(encryptedDetails));
-    const sig = ethlib.account.sign(ethUtil.bufferToHex(encryptedDetails), '0x' + pkey);
-    const origin = ethlib.account.recover(ethUtil.bufferToHex(encryptedDetails), sig);
-    console.log(origin);
-    console.log(userAddress);
-    console.log(userAddress === origin);
-    // prompt org to digitally sign offer details
-    // web3.eth.personal.sign(ethUtil.bufferToHex(detailsBuf), userAddress)
-    //   .then(sig => {
-    //     // save encrypted offer details to IPFS & receive its hash in return
-    //     ipfs.files.add(encryptedDetails, (err, files) => {
-    //       const detailsHash = files[0].hash;
-    //
-    //       // save details's hash to blockchain
-    //       contract.methods.makeOffer(prof.address, detailsHash, sig)
-    //         .send({from: userAddress})
-    //         .on('transactionHash', hash => {
-    //           dispatch({
-    //             type: SET_PROFESSIONALS,
-    //             professionals: professionals.filter(p => p.address !== prof.address)
-    //           })
-    //         });
-    //     });
-    //   })
-    //   .catch(console.log);
+    // 3. Save encrypted details to IPFS & receive its hash in return
+    ipfs.files.add(encryptedDetailsBuf, (err, files) => {
+      const detailsHash = files[0].hash;
+
+      const data = new FormData();
+      data.append('details', detailsHash);
+      data.append('org', userAddress);
+      data.append('orgSig', sig);
+      data.append('emp', prof.address);
+
+      // send details info to API
+      fetch(CONTRACTS_URL, {
+        method: 'POST',
+        headers: { 'Authorization': "key" },
+        body: data
+      }).then(resp => {
+        if (resp.ok) {
+          dispatch({
+            type: SET_PROFESSIONALS,
+            professionals: professionals.filter(p => p.address !== prof.address)
+          })
+        } else {
+          //TODO
+        }
+      });
+    });
   };
 
 export const addComment = (address, comment) =>

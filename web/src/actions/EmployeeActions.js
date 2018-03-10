@@ -1,73 +1,84 @@
-import { fetchObjectFromIPFS } from "../lib/ipfs";
+import axios from 'axios';
+import ethLib from 'eth-lib';
+
+import {
+  fetchUserFromIPFS,
+  fetchOfferFromIPFS
+} from "../lib/ipfs";
+import { decrypt } from "../lib/crypto";
 import getDate from '../lib/getDate';
 import {
   SET_OFFERS,
   SET_CAREER_PROFILE
 } from "../constants/actions";
+import {
+  CONTRACTS_URL
+} from '../properties/properties';
 
 
 export const setOffers = () =>
   async (dispatch, getState) => {
-
+    const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
     const ipfs = getState().ipfs.api;
     const pkey = getState().user.pkey;
 
-    // get number of all user's offers
-    const count = await contract.methods.getOffersCount().call({from: address});
+    // 1. get user's new offers
+    const resp = await axios.get(CONTRACTS_URL + '/emp/' + address, {
+      headers: { 'Authorization': 'key' }
+    });
+    const offers = resp.data;
 
-    // get all user's offers
-    let promises = [];
-    for (let i = 0; i < count; i++) {
-      promises.push(contract.methods.offersOf(address, i).call())
-    }
-    const allOffers = await Promise.all(promises);
-
-    // get info about new offers
-    const newOffers = allOffers.filter(o => Number(o['status']) === 0);
-
-    const details = await Promise.all(
-      newOffers.map(o => fetchObjectFromIPFS(ipfs, o['details']))
+    // 2. get offers' encrypted details from IPFS
+    const encryptedDetails = await Promise.all(
+      offers.map(o => fetchOfferFromIPFS(ipfs, o.details))
     );
 
-    promises = [];
-    newOffers.forEach(o => {
-      if (Number(o['status']) === 0) {
-        promises.push(contract.methods.orgInfo(o[0]).call());
-      } else {
-        promises.push(Promise.resolve(null));
-      }
-    });
-    const orgHashes = await Promise.all(promises);
-
-    // fetch organizations' info from IPFS
-    promises = [];
-    orgHashes.forEach(hash => {
-      promises.push(fetchObjectFromIPFS(ipfs, hash))
-      }
+    // 3. get offers' orgs
+    const orgHashes = await Promise.all(
+      offers.map(o => contract.methods.orgInfo(o.org).call())
     );
-    const orgs = await Promise.all(promises);
+    const orgs = await Promise.all(
+      orgHashes.map(oh => fetchUserFromIPFS(ipfs, oh))
+    );
 
-    const offers = [];
-    allOffers.forEach((o, i) => {
-      const org = orgs[i];
-      if (org) {
-        offers.push({
-          orgName: org.name,
-          position: o[1],
-          date: getDate(new Date(o[2] * 1000)),
-          index: i
-        });
+    // 4. decrypt offers' details using orgs' public keys
+    const details = [];
+    encryptedDetails.forEach((d, i) => {
+      details.push(
+        JSON.parse(decrypt(pkey, orgs[i].publicKey, d))
+      )
+    });
+
+    // 5. check offers authenticity using provided signatures
+    const detailsHex = details.map(d => web3.utils.sha3(JSON.stringify(d)));
+    const signatures = offers.map(o => o.orgSig);
+    detailsHex.forEach((d, i) => {
+      const realOrg = ethLib.account.recover(d, signatures[i]);
+      if (realOrg.toLowerCase() !== offers[i].org) {
+        console.log("ERROR!");
+        //TODO maybe just delete this offer cause it`s invalid or raise error
       }
     });
 
-    // store offers
-    dispatch({
-      type: SET_OFFERS,
-      offers: offers
-    });
-
+    // offers.forEach((o, i) => {
+    //   const org = orgs[i];
+    //   if (org) {
+    //     offers.push({
+    //       orgName: org.name,
+    //       position: o[1],
+    //       date: getDate(new Date(o[2] * 1000)),
+    //       index: i
+    //     });
+    //   }
+    // });
+    //
+    // // store offers
+    // dispatch({
+    //   type: SET_OFFERS,
+    //   offers: offers
+    // });
   };
 
 export const considerOffer = (index, approve) =>
@@ -117,7 +128,7 @@ export const setCareerProfile = () =>
     // fetch organizations' info from IPFS
     promises = [];
     orgHashes.forEach(hash =>
-      promises.push(fetchObjectFromIPFS(ipfs, hash))
+      promises.push(fetchUserFromIPFS(ipfs, hash))
     );
     const orgs = await Promise.all(promises);
 

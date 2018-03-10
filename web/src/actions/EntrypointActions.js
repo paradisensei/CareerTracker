@@ -1,5 +1,5 @@
 import { Assign } from '../lib/util';
-import { fetchObjectFromIPFS } from "../lib/ipfs";
+import { fetchUserFromIPFS } from "../lib/ipfs";
 import {
   SET_USER,
   SET_PKEY
@@ -25,14 +25,13 @@ export const setUser = () =>
     // check if user has employee account
     let userHash = await contract.methods.employeeInfo(address).call();
     if (userHash) {
-      const ans = await fetchObjectFromIPFS(ipfs, userHash);
+      const ans = await fetchUserFromIPFS(ipfs, userHash);
       user = Assign(ans, { address: address, role: EMPLOYEE });
     } else {
       // check if user has organization account
       userHash = await contract.methods.orgInfo(address).call();
       if (userHash) {
-        const ans = await fetchObjectFromIPFS(ipfs, userHash);
-        console.log(ans);
+        const ans = await fetchUserFromIPFS(ipfs, userHash);
         user = Assign(ans, { address: address, role: ORG });
       }
     }

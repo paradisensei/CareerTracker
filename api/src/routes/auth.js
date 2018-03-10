@@ -11,11 +11,7 @@ const AccessDenied = require('../models/Error').AccessDeniedError;
  *       in: header
  */
 function BasicAuth(req, def, token, callback){
-  console.log(req);
-  console.log('--------------------------');
-  console.log(def);
-  console.log();
-  if (token === '!') {
+  if (token === 'key') {
     return callback();
   }
   return req.res

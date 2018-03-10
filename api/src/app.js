@@ -6,6 +6,7 @@ const Express = require('express');
 const SwaggerJSDoc = require('swagger-jsdoc');
 const SwaggerTools = require('swagger-tools').initializeMiddleware;
 const helmet = require('helmet');
+const cors = require('cors');
 
 const pkg = require('../package.json');
 const config = require('./config');
@@ -30,6 +31,7 @@ const swaggerJsDoc = SwaggerJSDoc({
 
 const app = Express();
 app.use(helmet());
+app.use(cors());
 
 SwaggerTools(swaggerJsDoc, middleware => {
   app.use(middleware.swaggerMetadata());
