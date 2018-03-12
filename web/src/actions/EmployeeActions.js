@@ -62,6 +62,10 @@ export const setOffers = () =>
       }
     });
 
+    console.log(offers);
+    console.log(orgs);
+    console.log(details);
+
     // offers.forEach((o, i) => {
     //   const org = orgs[i];
     //   if (org) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { History } from '../../store/index';
 
 import { setProfessionals, makeOffer } from '../../actions/OrgActions';
 
@@ -10,15 +11,17 @@ import Grid from 'material-ui/Grid';
 
 class Search extends React.Component {
 
-  componentWillMount() {
-    // check whether user's offers are already set
-    if (!this.props.professionals) {
-      this.props.setProfessionals();
-    }
-  }
-
   render() {
-    const { professionals, makeOffer } = this.props;
+    const { user, professionals, setProfessionals, makeOffer } = this.props;
+
+    if (!user.set) {
+      History.push('/');
+      return null;
+    }
+
+    if (!professionals) {
+      setProfessionals();
+    }
 
     if (!professionals) {
       return <Empty/>
@@ -43,6 +46,7 @@ class Search extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
+  user: state.user,
   professionals: state.org.professionals
 });
 

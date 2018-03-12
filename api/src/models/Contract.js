@@ -76,12 +76,23 @@ ContractSchema.plugin(Hidden);
  * Methods
  */
 ContractSchema.method({
+
+
+
 });
 
 /**
  * Statics
  */
 ContractSchema.static({
+  byDetails(details){
+    const c = this.findOne({ details });
+    if (!c) {
+      throw new Error.NotFoundError();
+    }
+    return c;
+  },
+
   getOrgContracts(address){
     return this.find({ org: address });
   },
