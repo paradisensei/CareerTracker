@@ -56,7 +56,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   setOffers: () => dispatch(setOffers()),
-  considerOffer: (index, approve) => dispatch(considerOffer(index, approve))
+  considerOffer: (details, approve) => dispatch(considerOffer(details, approve))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Employee);

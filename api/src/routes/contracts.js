@@ -131,4 +131,61 @@ async function create(req, res, next){
   }
 }
 
-module.exports = { read, create };
+/**
+ * @swagger
+ * /contracts/consider:
+ *   post:
+ *     x-swagger-router-controller:
+ *       contracts
+ *     operationId:
+ *       consider
+ *     tags:
+ *       - Contracts
+ *     description: Соискатель принимает решение по поводу контракта
+ *     security:
+ *       - BasicAuth: []
+ *     x-security-scopes:
+ *       - all
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: data
+ *         in: body
+ *         description: Детали контракта и решение соискателя
+ *         schema:
+ *           type: object
+ *           required:
+ *             - details
+ *             - approve
+ *           properties:
+ *             details:
+ *               type: string
+ *               description: Ссылка на зашифрованные детали соглашения в IPFS
+ *             approve:
+ *               type: string
+ *               description: Решение соискателя по поводу контракта
+ *     responses:
+ *       200:
+ *         description: Успешно отработавший запрос
+ *         schema:
+ *           $ref: '#/definitions/Contract'
+ *       500:
+ *         description: Системная ошибка
+ *         schema:
+ *           $ref: '#/definitions/InternalError'
+ */
+async function consider(req, res, next){
+  const data = req.swagger.params.data.value;
+
+  try {
+    const contract = await Contract.byDetails(data.details);
+    contract.consider(data.approve);
+
+    res
+      .status(200);
+  }catch(e){
+    next(e);
+  }
+}
+
+module.exports = { read, create, consider };

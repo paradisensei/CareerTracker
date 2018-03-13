@@ -76,9 +76,10 @@ ContractSchema.plugin(Hidden);
  * Methods
  */
 ContractSchema.method({
-
-
-
+  async consider(approve){
+    this.status = approve ? 'approved' : 'declined';
+    await this.save();
+  }
 });
 
 /**

@@ -64,19 +64,6 @@ contract CareerTracker {
         orgs.push(msg.sender);
     }
 
-    /// Make an offer to particular employee
-    function makeOffer(address employee, string _details, string _orgSig) public {
-        Offer memory o = Offer({
-            details: _details,
-            orgSig: _orgSig,
-            empSig: '',
-            timestamp: now,
-            status: OfferStatus.No
-        });
-        offersOf[msg.sender].push(o);
-        offersOf[employee].push(o);
-    }
-
     /// Make a decision on particular offer
     function considerOffer(uint index, bool approve, string _empSig) public {
         Offer storage offer = offersOf[msg.sender][index];

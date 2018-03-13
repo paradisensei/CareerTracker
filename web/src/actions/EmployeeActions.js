@@ -7,12 +7,14 @@ import {
 } from "../lib/ipfs";
 import { decrypt } from "../lib/crypto";
 import getDate from '../lib/getDate';
+import { Assign } from '../lib/util';
 import {
   SET_OFFERS,
   SET_CAREER_PROFILE
 } from "../constants/actions";
 import {
-  CONTRACTS_URL
+  CONTRACTS_URL,
+  CONSIDER_CONTRACT_URL
 } from '../properties/properties';
 
 
@@ -62,44 +64,44 @@ export const setOffers = () =>
       }
     });
 
-    console.log(offers);
-    console.log(orgs);
-    console.log(details);
+    const finalOffers = offers.map((o, i) =>
+      Assign(details[i], {
+        orgName: orgs[i].name,
+        date: getDate(new Date(o.timestamp)),
+        details: o.details
+      })
+    );
 
-    // offers.forEach((o, i) => {
-    //   const org = orgs[i];
-    //   if (org) {
-    //     offers.push({
-    //       orgName: org.name,
-    //       position: o[1],
-    //       date: getDate(new Date(o[2] * 1000)),
-    //       index: i
-    //     });
-    //   }
-    // });
-    //
-    // // store offers
-    // dispatch({
-    //   type: SET_OFFERS,
-    //   offers: offers
-    // });
+    // store offers
+    dispatch({
+      type: SET_OFFERS,
+      offers: finalOffers
+    });
   };
 
-export const considerOffer = (index, approve) =>
+export const considerOffer = (details, approve) =>
   (dispatch, getState) => {
-
-    const contract = getState().contract.instance;
-    const address = getState().user.info.address;
     const offers = getState().employee.offers;
 
-    contract.methods.considerOffer(index, approve)
-      .send({from: address})
-      .on('transactionHash', hash =>
+    const data = new FormData();
+    data.append('details', details);
+    data.append('approve', approve);
+
+    // send request to API
+    fetch(CONSIDER_CONTRACT_URL, {
+      method: 'POST',
+      headers: { 'Authorization': "key" },
+      body: data
+    }).then(resp => {
+      if (resp.ok) {
         dispatch({
           type: SET_OFFERS,
-          offers: offers.filter(o => o.index !== index)
+          offers: offers.filter(o => o.details !== details)
         })
-      );
+      } else {
+        //TODO
+      }
+    }).catch(console.log);
   };
 
 export const setCareerProfile = () =>
