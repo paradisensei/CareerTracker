@@ -9,7 +9,7 @@ import { decrypt } from "../lib/crypto";
 import getDate from '../lib/getDate';
 import { Assign } from '../lib/util';
 import {
-  SET_OFFERS,
+  SET_EMP_OFFERS,
   SET_CAREER_PROFILE
 } from "../constants/actions";
 import {
@@ -74,18 +74,25 @@ export const setOffers = () =>
 
     // store offers
     dispatch({
-      type: SET_OFFERS,
+      type: SET_EMP_OFFERS,
       offers: finalOffers
     });
   };
 
 export const considerOffer = (details, approve) =>
   (dispatch, getState) => {
+    const web3 = getState().web3.instance;
+    const pkey = getState().user.pkey;
     const offers = getState().employee.offers;
+
+    // sign considered offer details
+    const detailsHex = web3.utils.sha3(JSON.stringify(details));
+    const sig = ethLib.account.sign(detailsHex, '0x' + pkey);
 
     const data = new FormData();
     data.append('details', details);
     data.append('approve', approve);
+    data.append('sig', sig);
 
     // send request to API
     fetch(CONSIDER_CONTRACT_URL, {
@@ -95,7 +102,7 @@ export const considerOffer = (details, approve) =>
     }).then(resp => {
       if (resp.ok) {
         dispatch({
-          type: SET_OFFERS,
+          type: SET_EMP_OFFERS,
           offers: offers.filter(o => o.details !== details)
         })
       } else {

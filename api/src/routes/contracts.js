@@ -164,6 +164,9 @@ async function create(req, res, next){
  *             approve:
  *               type: string
  *               description: Решение соискателя по поводу контракта
+ *             sig:
+ *               type: string
+ *               description: Подпись соискателя/работника
  *     responses:
  *       200:
  *         description: Успешно отработавший запрос
@@ -179,7 +182,7 @@ async function consider(req, res, next){
 
   try {
     const contract = await Contract.byDetails(data.details);
-    contract.consider(data.approve);
+    contract.consider(data.approve, data.sig);
 
     res
       .status(200);

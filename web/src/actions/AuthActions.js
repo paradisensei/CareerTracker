@@ -47,7 +47,7 @@ export const addUser = (user, role) =>
       .on('receipt', receipt =>
         dispatch({
           type: ADDED_USER,
-          info: Assign(user, { address: address, role:role  })
+          info: Assign(user, { publicKey: publicKey, address: address, role:role  })
         })
       );
       //TODO add error handling

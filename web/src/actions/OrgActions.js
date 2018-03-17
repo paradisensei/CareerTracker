@@ -1,10 +1,16 @@
+import axios from 'axios';
 import ethLib from 'eth-lib';
 
 import { Assign } from '../lib/util';
-import { fetchUserFromIPFS } from "../lib/ipfs";
-import { encrypt } from "../lib/crypto";
+import {
+  fetchUserFromIPFS,
+  fetchOfferFromIPFS
+} from "../lib/ipfs";
+import { encrypt, decrypt } from "../lib/crypto";
+import getDate from '../lib/getDate';
 import {
   SET_EMPLOYEES,
+  SET_ORG_OFFERS,
   SET_PROFESSIONALS
 } from '../constants/actions';
 import {
@@ -65,6 +71,45 @@ export const setEmployees = () =>
       employees: employees
     });
 
+  };
+
+export const setOffers = () =>
+  async (dispatch, getState) => {
+    const web3 = getState().web3.instance;
+    const contract = getState().contract.instance;
+    const address = getState().user.info.address;
+    const ipfs = getState().ipfs.api;
+    const pkey = getState().user.pkey;
+
+    // 1. get offers sent by org
+    const resp = await axios.get(CONTRACTS_URL + '/org/' + address, {
+      headers: { 'Authorization': 'key' }
+    });
+    const offers = resp.data;
+
+    // 2. get offers' employees
+    const empHashes = await Promise.all(
+      offers.map(o => contract.methods.employeeInfo(o.emp).call())
+    );
+    const emps = await Promise.all(
+      empHashes.map(oh => fetchUserFromIPFS(ipfs, oh))
+    );
+
+    // 3. TODO check offers authenticity using employees' signatures
+
+    const finalOffers = offers.map((o, i) =>
+      Assign({}, {
+        empName: emps[i].name,
+        date: getDate(new Date(o.timestamp)),
+        status: o.status,
+      })
+    );
+
+    // store offers
+    dispatch({
+      type: SET_ORG_OFFERS,
+      offers: finalOffers
+    });
   };
 
 export const setProfessionals = () =>

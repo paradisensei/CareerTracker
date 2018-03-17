@@ -76,8 +76,9 @@ ContractSchema.plugin(Hidden);
  * Methods
  */
 ContractSchema.method({
-  async consider(approve){
+  async consider(approve, sig){
     this.status = approve ? 'approved' : 'declined';
+    this.empSig = sig;
     await this.save();
   }
 });

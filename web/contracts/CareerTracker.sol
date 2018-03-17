@@ -6,16 +6,6 @@ pragma solidity ^0.4.20;
 */
 contract CareerTracker {
 
-    struct Offer {
-        string details;
-        string orgSig;
-        string empSig;
-        uint timestamp;
-        OfferStatus status;
-    }
-
-    enum OfferStatus { No, Approved, Declined }
-
     // This is a type for a single employment record.
     struct EmpRecord {
         address org;
@@ -36,9 +26,6 @@ contract CareerTracker {
     mapping (address => string) public orgInfo;
     // A dynamically-sized array containing organizations' addresses
     address[] public orgs;
-
-    // employee/org address -> employee's/org's offers
-    mapping (address => Offer[]) public offersOf;
 
     // employee address -> employee's employment history
     mapping (address => EmpRecord[]) public empRecordsOf;
@@ -102,11 +89,6 @@ contract CareerTracker {
     /// Get organizations' addresses
     function getOrgs() public constant returns (address[]) {
         return orgs;
-    }
-
-    /// Get offers count
-    function getOffersCount() public constant returns(uint) {
-        return offersOf[msg.sender].length;
     }
 
     /// Get employment records count

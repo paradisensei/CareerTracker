@@ -1,5 +1,5 @@
 import {
-  SET_OFFERS,
+  SET_EMP_OFFERS,
   SET_CAREER_PROFILE
 } from '../constants/actions';
 
@@ -10,7 +10,7 @@ const initialState = {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case SET_OFFERS:
+    case SET_EMP_OFFERS:
       return { ...state, offers: action.offers }
     case SET_CAREER_PROFILE:
       return { ...state, careerProfile: action.careerProfile }
