@@ -1,7 +1,7 @@
 import ethUtil from 'ethereumjs-util';
 
 import { Assign } from '../lib/util';
-import { saveUserToIPFS } from "../lib/ipfs";
+import { saveBufToIPFS } from "../lib/ipfs";
 
 import {
   ADD_USER_PENDING,
@@ -28,7 +28,9 @@ export const addUser = (user, role) =>
     const publicKey = ethUtil.bufferToHex(ethUtil.privateToPublic('0x' + pkey));
 
     // save raw user info to IPFS & receive its hash in return
-    const hash = await saveUserToIPFS(Assign(user, { publicKey: publicKey }), ipfs);
+    Assign(user, { publicKey: publicKey });
+    const userBuf = Buffer.from(JSON.stringify(user), 'utf8');
+    const hash = await saveBufToIPFS(userBuf, ipfs);
 
     // construct necessary method based on user type
     let method;
@@ -47,7 +49,7 @@ export const addUser = (user, role) =>
       .on('receipt', receipt =>
         dispatch({
           type: ADDED_USER,
-          info: Assign(user, { publicKey: publicKey, address: address, role:role  })
+          info: Assign(user, { address: address, role:role  })
         })
       );
       //TODO add error handling

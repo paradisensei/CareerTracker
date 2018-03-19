@@ -26,35 +26,22 @@ export const setOffers = () =>
     const ipfs = getState().ipfs.api;
     const pkey = getState().user.pkey;
 
-    // 1. get user's new offers
+    // Get user's new offers
     const resp = await axios.get(CONTRACTS_URL + '/emp/' + address, {
       headers: { 'Authorization': 'key' }
     });
     const offers = resp.data;
 
-    // 2. get offers' encrypted details from IPFS
-    const encryptedDetails = await Promise.all(
-      offers.map(o => fetchOfferFromIPFS(ipfs, o.details))
-    );
-
-    // 3. get offers' orgs
+    // Get offers' orgs
     const orgHashes = await Promise.all(
       offers.map(o => contract.methods.orgInfo(o.org).call())
     );
     const orgs = await Promise.all(
-      orgHashes.map(oh => fetchUserFromIPFS(ipfs, oh))
+      orgHashes.map(o => fetchUserFromIPFS(ipfs, o))
     );
 
-    // 4. decrypt offers' details using orgs' public keys
-    const details = [];
-    encryptedDetails.forEach((d, i) => {
-      details.push(
-        JSON.parse(decrypt(pkey, orgs[i].publicKey, d))
-      )
-    });
-
-    // 5. check offers authenticity using provided signatures
-    const detailsHex = details.map(d => web3.utils.sha3(JSON.stringify(d)));
+    // Check offers authenticity using provided signatures
+    const detailsHex = offers.map(o => web3.utils.sha3(o.secretDetails + o.publicDetails));
     const signatures = offers.map(o => o.orgSig);
     detailsHex.forEach((d, i) => {
       const realOrg = ethLib.account.recover(d, signatures[i]);
@@ -64,11 +51,32 @@ export const setOffers = () =>
       }
     });
 
+    // Get offers' encrypted details from IPFS
+    const encryptedDetails = await Promise.all(
+      offers.map(o => fetchOfferFromIPFS(o.secretDetails, true, ipfs))
+    );
+
+    // Get offers' public details from IPFS
+    const publicDetails = await Promise.all(
+      offers.map(o => fetchOfferFromIPFS(o.publicDetails, false, ipfs))
+    );
+
+    // Decrypt offers' secret details using orgs' public keys
+    const secretDetails = encryptedDetails.map(
+      (d, i) => JSON.parse(decrypt(pkey, orgs[i].publicKey, d))
+    );
+
+    // Construct original offers' details combining public & secret parts
+    const details = publicDetails.map((d, i) => {
+      return Assign(d, secretDetails[i]);
+    });
+
     const finalOffers = offers.map((o, i) =>
       Assign(details[i], {
         orgName: orgs[i].name,
         date: getDate(new Date(o.timestamp)),
-        details: o.details
+        publicDetails: o.publicDetails,
+        secretDetails: o.secretDetails
       })
     );
 
@@ -79,18 +87,20 @@ export const setOffers = () =>
     });
   };
 
-export const considerOffer = (details, approve) =>
+export const considerOffer = (offer, approve) =>
   (dispatch, getState) => {
     const web3 = getState().web3.instance;
     const pkey = getState().user.pkey;
     const offers = getState().employee.offers;
 
-    // sign considered offer details
-    const detailsHex = web3.utils.sha3(JSON.stringify(details));
+    const { secretDetails, publicDetails } = offer;
+
+    // Merge secret & public details hashes and sign using emp's private key
+    const detailsHex = web3.utils.sha3(secretDetails + publicDetails);
     const sig = ethLib.account.sign(detailsHex, '0x' + pkey);
 
     const data = new FormData();
-    data.append('details', details);
+    data.append('details', publicDetails);
     data.append('approve', approve);
     data.append('sig', sig);
 
@@ -103,7 +113,7 @@ export const considerOffer = (details, approve) =>
       if (resp.ok) {
         dispatch({
           type: SET_EMP_OFFERS,
-          offers: offers.filter(o => o.details !== details)
+          offers: offers.filter(o => o.publicDetails !== publicDetails)
         })
       } else {
         //TODO

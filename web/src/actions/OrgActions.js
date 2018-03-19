@@ -3,6 +3,7 @@ import ethLib from 'eth-lib';
 
 import { Assign } from '../lib/util';
 import {
+  saveBufToIPFS,
   fetchUserFromIPFS,
   fetchOfferFromIPFS
 } from "../lib/ipfs";
@@ -153,47 +154,52 @@ export const setProfessionals = () =>
   };
 
 export const makeOffer = (prof, details) =>
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
     const web3 = getState().web3.instance;
     const userAddress = getState().user.info.address;
     const professionals = getState().org.professionals;
     const ipfs = getState().ipfs.api;
     const pkey = getState().user.pkey;
 
-    // 1. Sign details hash using org's private key
-    const detailsHex = web3.utils.sha3(JSON.stringify(details));
-    const sig = ethLib.account.sign(detailsHex, '0x' + pkey);
+    // Split contract details into public & secret parts
+    const { position, start, ...secretDetails } = details;
+    const publicDetails = { position, start };
 
-    // 2. Encrypt details using recipient's public key
-    const detailsBuf = new Buffer(JSON.stringify(details), 'utf8');
+    // Encrypt secret details using recipient's public key & save to IPFS
+    let detailsBuf = new Buffer(JSON.stringify(secretDetails), 'utf8');
     const encryptedDetails = encrypt(pkey, prof.publicKey, detailsBuf);
     const encryptedDetailsBuf = new Buffer(encryptedDetails, 'hex');
+    const secretDetailsHash = await saveBufToIPFS(encryptedDetailsBuf, ipfs);
 
-    // 3. Save encrypted details to IPFS & receive its hash in return
-    ipfs.files.add(encryptedDetailsBuf, (err, files) => {
-      const detailsHash = files[0].hash;
+    // Save public details to IPFS & receive its hash in return
+    detailsBuf = new Buffer(JSON.stringify(publicDetails), 'utf8');
+    const publicDetailsHash = await saveBufToIPFS(detailsBuf, ipfs);
 
-      const data = new FormData();
-      data.append('details', detailsHash);
-      data.append('org', userAddress);
-      data.append('orgSig', sig);
-      data.append('emp', prof.address);
+    // Merge secret & public details hashes and sign using org's private key
+    const detailsHex = web3.utils.sha3(secretDetailsHash + publicDetailsHash);
+    const sig = ethLib.account.sign(detailsHex, '0x' + pkey);
 
-      // send details info to API
-      fetch(CONTRACTS_URL, {
-        method: 'POST',
-        headers: { 'Authorization': "key" },
-        body: data
-      }).then(resp => {
-        if (resp.ok) {
-          dispatch({
-            type: SET_PROFESSIONALS,
-            professionals: professionals.filter(p => p.address !== prof.address)
-          })
-        } else {
-          //TODO
-        }
-      });
+    // Save offer info to API
+    const data = new FormData();
+    data.append('publicDetails', publicDetailsHash);
+    data.append('secretDetails', secretDetailsHash);
+    data.append('org', userAddress);
+    data.append('orgSig', sig);
+    data.append('emp', prof.address);
+
+    fetch(CONTRACTS_URL, {
+      method: 'POST',
+      headers: { 'Authorization': "key" },
+      body: data
+    }).then(resp => {
+      if (resp.ok) {
+        dispatch({
+          type: SET_PROFESSIONALS,
+          professionals: professionals.filter(p => p.address !== prof.address)
+        })
+      } else {
+        //TODO
+      }
     });
   };
 

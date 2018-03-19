@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { History } from '../../store/index';
 
 import { setCareerProfile } from '../../actions/EmployeeActions';
 
@@ -10,15 +11,17 @@ import List from 'material-ui/List';
 
 class EmployeeCareer extends React.Component {
 
-  componentWillMount() {
-    // check whether user's offers are already set
-    if (!this.props.careerProfile) {
-      this.props.setCareerProfile();
-    }
-  }
-
   render() {
-    const { careerProfile } = this.props;
+    const { user, careerProfile, setCareerProfile } = this.props;
+
+    if (!user.set) {
+      History.push('/');
+      return null;
+    }
+
+    if (!careerProfile) {
+      setCareerProfile();
+    }
 
     if (!careerProfile) {
       return <Empty/>
@@ -43,6 +46,7 @@ class EmployeeCareer extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
+  user: state.user,
   careerProfile: state.employee.careerProfile
 });
 

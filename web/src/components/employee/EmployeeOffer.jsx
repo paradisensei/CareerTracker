@@ -6,19 +6,19 @@ import { ListItem, ListItemText } from 'material-ui/List';
 import Button from 'material-ui/Button';
 
 const EmployeeOffer = ({ classes, offer, considerOffer }) =>
-  <ListItem key={offer.details}>
+  <ListItem key={offer.publicDetails}>
     <ListItemText primary={
       `${offer.date} ${offer.orgName} пригласил/а вас на должность ${offer.position}
       с зарплатой ${offer.salary} и началом работы ${offer.start}`
     }/>
     <Button color="primary"
             className={classes.button}
-            onClick={considerOffer.bind(null, offer.details, true)}>
+            onClick={considerOffer.bind(null, offer, true)}>
       Принять
     </Button>
     <Button color="accent"
             className={classes.button}
-            onClick={considerOffer.bind(null, offer.details, false)}>
+            onClick={considerOffer.bind(null, offer, false)}>
       Отказаться
     </Button>
   </ListItem>

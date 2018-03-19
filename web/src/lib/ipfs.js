@@ -1,17 +1,3 @@
-export const saveUserToIPFS = (user, ipfs) => {
-  const userBuf = Buffer.from(JSON.stringify(user), 'utf8');
-
-  return new Promise((resolve, reject) => {
-    ipfs.files.add(userBuf, (err, files) => {
-      if (err || !files) {
-        reject(err);
-      } else {
-        resolve(files[0].hash);
-      }
-    });
-  });
-};
-
 export const fetchUserFromIPFS = (ipfs, hash) => {
   return new Promise((resolve, reject) => {
     ipfs.files.get(hash, (err, files) => {
@@ -24,13 +10,29 @@ export const fetchUserFromIPFS = (ipfs, hash) => {
   });
 };
 
-export const fetchOfferFromIPFS = (ipfs, hash) => {
+export const saveBufToIPFS = (buf, ipfs) => {
+  return new Promise((resolve, reject) => {
+    ipfs.files.add(buf, (err, files) => {
+      if (err || !files) {
+        reject(err);
+      } else {
+        resolve(files[0].hash);
+      }
+    });
+  });
+};
+
+export const fetchOfferFromIPFS = (hash, secret, ipfs) => {
   return new Promise((resolve, reject) => {
     ipfs.files.get(hash, (err, files) => {
       if (err || !files) {
         reject(err)
       }
-      resolve(files[0].content.toString('hex'));
+      if (secret) {
+        resolve(files[0].content.toString('hex'));
+      } else {
+        resolve(JSON.parse(files[0].content.toString()));
+      }
     });
   });
 };

@@ -32,7 +32,7 @@ class Org extends React.Component {
       return <Empty/>
     }
 
-    let empBody = 'Здесь будут отображаться ваши сотрудники, которых пока нет :)';
+    let empBody = <p>Здесь будут отображаться ваши сотрудники, которых пока нет :)</p>;
     if (employees.length > 0) {
       empBody = <div>
         <h2>Ваши сотрудники</h2>
@@ -42,7 +42,7 @@ class Org extends React.Component {
       </div>
     }
 
-    let offBody = 'Здесь отображаются высланные офферы и их статусы';
+    let offBody = <p>Здесь отображаются высланные офферы и их статусы</p>;
     if (offers.length > 0) {
       offBody = <div>
         <h2>Высланные офферы</h2>

@@ -88,12 +88,16 @@ async function read(req, res, next){
  *         schema:
  *           type: object
  *           required:
- *             - details
+ *             - publicDetails
+ *             - secretDetails
  *             - org
  *             - orgSig
  *             - emp
  *           properties:
- *             details:
+ *             publicDetails:
+ *               type: string
+ *               description: Ссылка на публичные детали соглашения в IPFS
+ *             secretDetails:
  *               type: string
  *               description: Ссылка на зашифрованные детали соглашения в IPFS
  *             org:
@@ -160,7 +164,7 @@ async function create(req, res, next){
  *           properties:
  *             details:
  *               type: string
- *               description: Ссылка на зашифрованные детали соглашения в IPFS
+ *               description: Ссылка на публичные детали соглашения в IPFS
  *             approve:
  *               type: string
  *               description: Решение соискателя по поводу контракта

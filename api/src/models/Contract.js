@@ -13,7 +13,9 @@ const Error = require('../models/Error');
  *     type: object
  *     description: Объект оффера/контракта между компанией и работником
  *     properties:
- *       details:
+ *       publicDetails:
+ *         type: string
+ *       secretDetails:
  *         type: string
  *       org:
  *         type: string
@@ -30,7 +32,12 @@ const Error = require('../models/Error');
  *          enum: [approved, declined]
  */
 const ContractSchema = new mongoose.Schema({
-  details: {
+  publicDetails: {
+    type: String,
+    required: true
+  },
+
+  secretDetails: {
     type: String,
     required: true
   },
@@ -87,8 +94,8 @@ ContractSchema.method({
  * Statics
  */
 ContractSchema.static({
-  byDetails(details){
-    const c = this.findOne({ details });
+  byDetails(publicDetails){
+    const c = this.findOne({ publicDetails });
     if (!c) {
       throw new Error.NotFoundError();
     }
