@@ -80,23 +80,31 @@ export const setOffers = () =>
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
     const ipfs = getState().ipfs.api;
-    const pkey = getState().user.pkey;
 
-    // 1. get offers sent by org
+    // Get offers sent by org
     const resp = await axios.get(CONTRACTS_URL + '/org/' + address, {
       headers: { 'Authorization': 'key' }
     });
     const offers = resp.data;
 
-    // 2. get offers' employees
+    // Get offers' employees
     const empHashes = await Promise.all(
       offers.map(o => contract.methods.employeeInfo(o.emp).call())
     );
     const emps = await Promise.all(
-      empHashes.map(oh => fetchUserFromIPFS(ipfs, oh))
+      empHashes.map(o => fetchUserFromIPFS(ipfs, o))
     );
 
-    // 3. TODO check offers authenticity using employees' signatures
+    // Check offers authenticity using provided signatures
+    const detailsHex = offers.map(o => web3.utils.sha3(o.secretDetails + o.publicDetails));
+    const signatures = offers.map(o => o.empSig);
+    detailsHex.forEach((d, i) => {
+      const realEmp = ethLib.account.recover(d, signatures[i]);
+      if (realEmp.toLowerCase() !== offers[i].emp) {
+        console.log("ERROR!");
+        //TODO maybe just delete this offer cause it`s invalid or raise error
+      }
+    });
 
     const finalOffers = offers.map((o, i) =>
       Assign({}, {

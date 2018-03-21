@@ -8,6 +8,11 @@ const {
   HOST_URI = 'localhost:8080',
 
   MONGO_URI = '',
+
+  ETHEREUM_RPC = '',
+
+  CONTRACT_ADDRESS = '',
+  CONTRACT_OWNER = ''
 } = process.env;
 
 module.exports = {
@@ -18,4 +23,11 @@ module.exports = {
   hostUri: HOST_URI,
 
   mongoUri: MONGO_URI,
+
+  ethereumRpc: ETHEREUM_RPC,
+
+  contract: {
+    address: CONTRACT_ADDRESS,
+    owner: CONTRACT_OWNER
+  }
 };

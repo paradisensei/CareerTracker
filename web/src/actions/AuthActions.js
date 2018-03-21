@@ -28,7 +28,7 @@ export const addUser = (user, role) =>
     const publicKey = ethUtil.bufferToHex(ethUtil.privateToPublic('0x' + pkey));
 
     // save raw user info to IPFS & receive its hash in return
-    Assign(user, { publicKey: publicKey });
+    user = Assign(user, { publicKey: publicKey });
     const userBuf = Buffer.from(JSON.stringify(user), 'utf8');
     const hash = await saveBufToIPFS(userBuf, ipfs);
 

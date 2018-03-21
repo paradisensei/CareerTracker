@@ -1,21 +1,13 @@
 pragma solidity ^0.4.20;
 
+import "./Ownable.sol";
+import "./Contract.sol";
+
 /**
  * @title CareerTracker
  * @dev   A contract to track career
 */
-contract CareerTracker {
-
-    // This is a type for a single employment record.
-    struct EmpRecord {
-        address org;
-        string position;
-        uint timestamp;
-        string comment;
-        EmploymentStatus status;
-    }
-
-    enum EmploymentStatus { In, Out, Fired }
+contract CareerTracker is Ownable {
 
     // employee's address -> hash of employee's information on IPFS
     mapping (address => string) public employeeInfo;
@@ -28,7 +20,7 @@ contract CareerTracker {
     address[] public orgs;
 
     // employee address -> employee's employment history
-    mapping (address => EmpRecord[]) public empRecordsOf;
+    mapping (address => address[]) public empContractsOf;
 
     // organization address -> organization's employees
     mapping (address => address[]) public employeesOf;
@@ -51,29 +43,20 @@ contract CareerTracker {
         orgs.push(msg.sender);
     }
 
-    /// Make a decision on particular offer
-    function considerOffer(uint index, bool approve, string _empSig) public {
-        Offer storage offer = offersOf[msg.sender][index];
-        if (approve) {
-            EmpRecord[] memory records = empRecordsOf[msg.sender];
-
-            // can accept offer only if unemployed
-            uint len = records.length;
-            if (len > 0) {
-                require(records[len - 1].status != EmploymentStatus.In);
-            }
-            offer.empSig = _empSig;
-            offer.status = OfferStatus.Approved;
-            empRecordsOf[msg.sender].push(EmpRecord({
-                org: offer.org,
-                position: offer.position,
-                timestamp: now,
-                comment: '',
-                status: EmploymentStatus.In
-            }));
-        } else {
-            offer.status = OfferStatus.Declined;
-        }
+    /// Publish new employment contract
+    function publishContract(
+        address emp, address org,
+        string secretDetails, string publicDetails,
+        string orgSig, string empSig
+    )
+        public onlyOwner returns (address)
+    {
+        Contract c = new Contract(
+            org, secretDetails, publicDetails, orgSig, empSig
+        );
+        empContractsOf[emp].push(c);
+        employeesOf[org].push(emp);
+        return c;
     }
 
     /// Get organization's employees' addresses
@@ -81,7 +64,7 @@ contract CareerTracker {
         return employeesOf[msg.sender];
     }
 
-    /// Get other employees' addresses
+    /// Get employees' addresses
     function getEmployees() public constant returns (address[]) {
         return employees;
     }
@@ -91,9 +74,9 @@ contract CareerTracker {
         return orgs;
     }
 
-    /// Get employment records count
-    function getEmpRecordsCount() public constant returns(uint) {
-        return empRecordsOf[msg.sender].length;
+    /// Get number of employment records
+    function getEmpContractsCount() public constant returns(uint) {
+        return empContractsOf[msg.sender].length;
     }
 
 }

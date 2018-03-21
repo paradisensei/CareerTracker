@@ -24,7 +24,8 @@
     "node-fetch": "^1.7.3",
     "pm2": "^2.9.1",
     "swagger-jsdoc": "^1.9.7",
-    "swagger-tools": "^0.10.3"
+    "swagger-tools": "^0.10.3",
+    "web3": "^1.0.0-beta.26"
   },
   "devDependencies": {
     "nodemon": "^1.13.3"

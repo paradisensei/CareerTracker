@@ -3,6 +3,8 @@
 const mongoose = require('mongoose');
 const Hidden = require('mongoose-hidden')();
 
+const Contract = require('../rpc/contract');
+
 const Error = require('../models/Error');
 
 /**
@@ -84,9 +86,17 @@ ContractSchema.plugin(Hidden);
  */
 ContractSchema.method({
   async consider(approve, sig){
-    this.status = approve ? 'approved' : 'declined';
-    this.empSig = sig;
-    await this.save();
+    // this.empSig = sig;
+    if (approve) {
+      // this.status = 'approved';
+      const txId = await Contract.publishContract(
+        this.emp, this.org, this.secretDetails, this.publicDetails, this.orgSig, sig
+      );
+      console.log(txId);
+    } else {
+      // this.status = 'declined';
+    }
+    // await this.save();
   }
 });
 

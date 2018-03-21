@@ -9,15 +9,11 @@ const OrgOffer = ({ classes, offer }) =>
   <ListItem key={offer.date}>
     <ListItemText primary={
       `${offer.date} вы пригласили на работу ${offer.empName}
-      и он ${offer.status}`
+      и он ${offer.status === 'approved' ? 'согласился' : 'declined' ? 'отказался' : 'еще думает'}`
     }/>
     <Button color="primary"
             className={classes.button}>
-      Оформить договор
-    </Button>
-    <Button color="accent"
-            className={classes.button}>
-      Отказаться
+      Ссылка на договор-контракт в блокчейне
     </Button>
   </ListItem>
 
