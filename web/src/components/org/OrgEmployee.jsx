@@ -28,11 +28,12 @@ class OrgEmployee extends React.Component {
     const { dialog, comment } = this.state;
 
     let body = null;
-    if (!employee.comment.trim()) {
+    //TODO
+    // if (!employee.comment.trim()) {
       body = <Button color="accent" onClick={openDialog.bind(this)}>
         Дать рекомендацию
       </Button>
-    }
+    // }
 
     return (
       <Grid item xs>
@@ -54,6 +55,11 @@ class OrgEmployee extends React.Component {
               <i>Паспортные данные : </i>{employee.passport}
             </Typography>
             {body}
+            <Button color="primary"
+                    href={employee.contract} target="blank"
+                    className={classes.button}>
+              Контракт в блокчейне
+            </Button>
             <Dialog fullWidth
                     open={dialog}
                     onRequestClose={closeDialog.bind(this)}>

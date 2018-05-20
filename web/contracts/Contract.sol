@@ -36,6 +36,6 @@ contract Contract {
 
     enum EmploymentStatus { In, Out, Fired }
 
-    // add employment status & comment-recommendation
+    //TODO add employment status & comment-recommendation
 
 }

@@ -5,7 +5,7 @@ import { Assign } from '../lib/util';
 import {
   saveBufToIPFS,
   fetchUserFromIPFS,
-  fetchOfferFromIPFS
+  fetchContractDetailsFromIPFS
 } from "../lib/ipfs";
 import { encrypt, decrypt } from "../lib/crypto";
 import getDate from '../lib/getDate';
@@ -17,11 +17,13 @@ import {
 import {
   CONTRACTS_URL
 } from '../properties/properties';
+const abi = require('../properties/abi/ContractAbi.json');
 
 
 export const setEmployees = () =>
   async (dispatch, getState) => {
 
+    const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
     const ipfs = getState().ipfs.api;
@@ -46,25 +48,36 @@ export const setEmployees = () =>
     // get last employment record for every employee
     promises = [];
     staffAddr.forEach(e =>
-      promises.push(contract.methods.getEmpRecordsCount().call({from: e}))
+      promises.push(contract.methods.getEmpContractsCount().call({from: e}))
     );
     const emplsRecCount = await Promise.all(promises);
 
     promises = [];
     staffAddr.forEach((e, i) => {
       const last = emplsRecCount[i] - 1;
-      promises.push(contract.methods.empRecordsOf(e, last).call());
+      promises.push(contract.methods.empContractsOf(e, last).call());
     });
-    const emplsRec = await Promise.all(promises);
+    const empLastContract = await Promise.all(promises);
 
-    const employees = [];
+    promises = [];
     empls.forEach((e, i) => {
-      const record = emplsRec[i];
-      const employee = Assign(e, {
-        address: staffAddr[i], position: record[1], comment: record[3]
-      });
-      employees.push(employee);
-    })
+      const empContract = new web3.eth.Contract(abi, empLastContract[i]);
+      promises.push(empContract.methods.publicDetails().call());
+    });
+    const empDetailsHash = await Promise.all(promises);
+
+    promises = [];
+    empls.forEach((e, i) => {
+      promises.push(fetchContractDetailsFromIPFS(ipfs, empDetailsHash[i]));
+    });
+    const empDetails = await Promise.all(promises);
+
+    const employees = empls.map((e, i) => Assign(e, {
+      address: staffAddr[i],
+      position: empDetails[i]['position'],
+      start: empDetails[i]['start'],
+      contract: 'https://etherscan.io/address/' + empLastContract[i]
+    }));
 
     // store employees
     dispatch({
@@ -99,10 +112,12 @@ export const setOffers = () =>
     const detailsHex = offers.map(o => web3.utils.sha3(o.secretDetails + o.publicDetails));
     const signatures = offers.map(o => o.empSig);
     detailsHex.forEach((d, i) => {
-      const realEmp = ethLib.account.recover(d, signatures[i]);
-      if (realEmp.toLowerCase() !== offers[i].emp) {
-        console.log("ERROR!");
-        //TODO maybe just delete this offer cause it`s invalid or raise error
+      if (signatures[i]) {
+        const realEmp = ethLib.account.recover(d, signatures[i]);
+        if (realEmp.toLowerCase() !== offers[i].emp) {
+          console.log("ERROR!");
+          //TODO maybe just delete this offer cause it`s invalid or raise error
+        }
       }
     });
 
@@ -151,7 +166,7 @@ export const setProfessionals = () =>
     profs.forEach((p, i) => {
       const prof = Assign(p, { address: profsAddr[i] });
       professionals.push(prof);
-    })
+    });
 
     // store professionals
     dispatch({

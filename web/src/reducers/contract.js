@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import {
   CONTRACT_ADDRESS
 } from '../properties/properties';
-const abi = require('../properties/abi.json');
+const abi = require('../properties/abi/CareerTrackerAbi.json');
 
 // instantiate web3
 const web3 = new Web3(Web3.givenProvider);

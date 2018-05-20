@@ -64,6 +64,16 @@ contract CareerTracker is Ownable {
         return employeesOf[msg.sender];
     }
 
+    /// Get employees' employment contracts
+    function getEmpContracts() public constant returns(address[]) {
+        return empContractsOf[msg.sender];
+    }
+
+    /// Get number of employment records
+    function getEmpContractsCount() public constant returns(uint) {
+        return empContractsOf[msg.sender].length;
+    }
+
     /// Get employees' addresses
     function getEmployees() public constant returns (address[]) {
         return employees;
@@ -72,11 +82,6 @@ contract CareerTracker is Ownable {
     /// Get organizations' addresses
     function getOrgs() public constant returns (address[]) {
         return orgs;
-    }
-
-    /// Get number of employment records
-    function getEmpContractsCount() public constant returns(uint) {
-        return empContractsOf[msg.sender].length;
     }
 
 }

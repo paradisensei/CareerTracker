@@ -86,17 +86,17 @@ ContractSchema.plugin(Hidden);
  */
 ContractSchema.method({
   async consider(approve, sig){
-    // this.empSig = sig;
+    this.empSig = sig;
     if (approve) {
-      // this.status = 'approved';
+      this.status = 'approved';
       const txId = await Contract.publishContract(
         this.emp, this.org, this.secretDetails, this.publicDetails, this.orgSig, sig
       );
       console.log(txId);
     } else {
-      // this.status = 'declined';
+      this.status = 'declined';
     }
-    // await this.save();
+    await this.save();
   }
 });
 

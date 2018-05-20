@@ -3,7 +3,8 @@ import ethLib from 'eth-lib';
 
 import {
   fetchUserFromIPFS,
-  fetchOfferFromIPFS
+  fetchOfferFromIPFS,
+  fetchContractDetailsFromIPFS
 } from "../lib/ipfs";
 import { decrypt } from "../lib/crypto";
 import getDate from '../lib/getDate';
@@ -16,6 +17,7 @@ import {
   CONTRACTS_URL,
   CONSIDER_CONTRACT_URL
 } from '../properties/properties';
+const abi = require('../properties/abi/ContractAbi.json');
 
 
 export const setOffers = () =>
@@ -113,7 +115,12 @@ export const considerOffer = (offer, approve) =>
       if (resp.ok) {
         dispatch({
           type: SET_EMP_OFFERS,
-          offers: offers.filter(o => o.publicDetails !== publicDetails)
+          offers: offers.filter(o => {
+            console.log(o.publicDetails);
+            console.log(publicDetails);
+            console.log(o.publicDetails !== publicDetails);
+            return o.publicDetails !== publicDetails
+          })
         })
       } else {
         //TODO
@@ -124,50 +131,59 @@ export const considerOffer = (offer, approve) =>
 export const setCareerProfile = () =>
   async (dispatch, getState) => {
 
+    const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
     const address = getState().user.info.address;
     const ipfs = getState().ipfs.api;
 
     // get employment records
-    const count = await contract.methods.getEmpRecordsCount().call({from: address});
+    const allEmpRecords = await contract.methods.getEmpContracts().call({from: address});
 
-    let promises = [];
-    for (let i = 0; i < count; i++) {
-      promises.push(contract.methods.empRecordsOf(address, i).call());
-    }
-    const allEmpRecords = await Promise.all(promises);
-
+    //TODO
     // fetch actual recommendation comments from IPFS
-    promises = allEmpRecords.map(r => fetchComment(ipfs, r[3]));
-    const comments = await Promise.all(promises);
+    // promises = allEmpRecords.map(r => fetchComment(ipfs, r[3]));
+    // const comments = await Promise.all(promises);
 
     // get associated organizations's hashes
-    promises = [];
-    allEmpRecords.forEach(r =>
-      promises.push(contract.methods.orgInfo(r[0]).call())
-    );
-    const orgHashes = await Promise.all(promises);
+
+    let detailsPromises = [];
+    let promises = [];
+    allEmpRecords.forEach(r => {
+      const empContract = new web3.eth.Contract(abi, r);
+      detailsPromises.push(empContract.methods.publicDetails().call());
+      promises.push(empContract.methods.org().call())
+    });
+    const detailsHash = await Promise.all(detailsPromises);
+    const orgAddrs = await Promise.all(promises);
+
+    const orgHashes = await Promise.all(orgAddrs.map(
+      a => contract.methods.orgInfo(a).call()
+    ));
 
     // fetch organizations' info from IPFS
-    promises = [];
-    orgHashes.forEach(hash =>
-      promises.push(fetchUserFromIPFS(ipfs, hash))
-    );
-    const orgs = await Promise.all(promises);
+    const orgs = await Promise.all(orgHashes.map(
+      hash => fetchUserFromIPFS(ipfs, hash)
+    ));
+
+    // fetch contract details from IPFS
+    const details = await Promise.all(detailsHash.map(
+      hash => fetchContractDetailsFromIPFS(ipfs, hash)
+    ));
 
     const careerProfile = [];
-    allEmpRecords.forEach((r, i) => {
-      const org = orgs[i].name;
-      const comment = comments[i];
+    orgs.forEach((o, i) => {
+      const det = details[i];
+      // const comment = comments[i];
 
       careerProfile.push({
-        orgName: org,
-        position: r[1],
-        date: getDate(new Date(r[2] * 1000)),
-        comment: comment,
-        status: r[4]
+        orgName: o.name,
+        position: det.position,
+        date: getDate(new Date(det.start)),
+        // comment: comment,
+        status: 0,
+        contract: 'https://etherscan.io/address/' + allEmpRecords[i]
       });
-    })
+    });
 
     // store employee's career profile
     dispatch({

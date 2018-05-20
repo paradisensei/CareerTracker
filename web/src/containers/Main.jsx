@@ -98,7 +98,6 @@ const theme = createMuiTheme({
 const styles = theme => ({
   main: {
     width: '100%',
-    height: Screen.height,
     zIndex: 1,
     overflow: 'hidden',
   },

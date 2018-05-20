@@ -36,3 +36,15 @@ export const fetchOfferFromIPFS = (hash, secret, ipfs) => {
     });
   });
 };
+
+export const fetchContractDetailsFromIPFS = (ipfs, hash) => {
+  return new Promise((resolve, reject) => {
+    ipfs.files.get(hash, (err, files) => {
+      if (err || !files) {
+        reject(err)
+      }
+      const rawDetails = files[0].content.toString();
+      resolve(JSON.parse(rawDetails));
+    });
+  });
+};
