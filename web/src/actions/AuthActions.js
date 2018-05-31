@@ -15,6 +15,7 @@ import {
 export const addUser = (user, role) =>
   async (dispatch, getState) => {
 
+    // fetch necessary refs from the app state
     const web3 = getState().web3.instance;
     const contract = getState().contract.instance;
     const ipfs = getState().ipfs.api;
@@ -32,7 +33,7 @@ export const addUser = (user, role) =>
     const userBuf = Buffer.from(JSON.stringify(user), 'utf8');
     const hash = await saveBufToIPFS(userBuf, ipfs);
 
-    // construct necessary method based on user type
+    // construct necessary smart contract's method based on user's account type
     let method;
     if (role === EMPLOYEE) {
       method = contract.methods.newEmployee(hash);
@@ -40,6 +41,7 @@ export const addUser = (user, role) =>
       method = contract.methods.newOrg(hash);
     }
 
+    // invoke constructed smart contract's method
     method.send({from: address})
       .on('transactionHash', hash =>
         dispatch({
@@ -52,5 +54,4 @@ export const addUser = (user, role) =>
           info: Assign(user, { address: address, role:role  })
         })
       );
-      //TODO add error handling
     };

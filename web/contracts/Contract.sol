@@ -30,12 +30,4 @@ contract Contract {
         empSig = _empSig;
     }
 
-    function verify() public pure returns (bool) {
-        return true;    
-    }
-
-    enum EmploymentStatus { In, Out, Fired }
-
-    //TODO add employment status & comment-recommendation
-
 }

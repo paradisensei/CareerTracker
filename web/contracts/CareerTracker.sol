@@ -5,24 +5,24 @@ import "./Contract.sol";
 
 /**
  * @title CareerTracker
- * @dev   A contract to track career
+ * @dev   Main contract to track career
 */
 contract CareerTracker is Ownable {
 
-    // employee's address -> hash of employee's information on IPFS
+    // employee's address -> hash of employee's information in IPFS
     mapping (address => string) public employeeInfo;
     // A dynamically-sized array containing employees' addresses
     address[] public employees;
 
-    // organization's address -> hash of organization's information on IPFS
+    // organization's address -> hash of organization's information in IPFS
     mapping (address => string) public orgInfo;
     // A dynamically-sized array containing organizations' addresses
     address[] public orgs;
 
-    // employee address -> employee's employment history
+    // employee's address -> employee's employment history
     mapping (address => address[]) public empContractsOf;
 
-    // organization address -> organization's employees
+    // organization's address -> organization's employees
     mapping (address => address[]) public employeesOf;
 
     modifier newUser() {
@@ -69,7 +69,7 @@ contract CareerTracker is Ownable {
         return empContractsOf[msg.sender];
     }
 
-    /// Get number of employment records
+    /// Get employee's number of employment records
     function getEmpContractsCount() public constant returns(uint) {
         return empContractsOf[msg.sender].length;
     }

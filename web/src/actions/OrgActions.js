@@ -178,6 +178,8 @@ export const setProfessionals = () =>
 
 export const makeOffer = (prof, details) =>
   async (dispatch, getState) => {
+
+    // fetch necessary refs from the app state
     const web3 = getState().web3.instance;
     const userAddress = getState().user.info.address;
     const professionals = getState().org.professionals;
@@ -202,7 +204,7 @@ export const makeOffer = (prof, details) =>
     const detailsHex = web3.utils.sha3(secretDetailsHash + publicDetailsHash);
     const sig = ethLib.account.sign(detailsHex, '0x' + pkey);
 
-    // Save offer info to API
+    // Send offer details to server
     const data = new FormData();
     data.append('publicDetails', publicDetailsHash);
     data.append('secretDetails', secretDetailsHash);
@@ -220,8 +222,6 @@ export const makeOffer = (prof, details) =>
           type: SET_PROFESSIONALS,
           professionals: professionals.filter(p => p.address !== prof.address)
         })
-      } else {
-        //TODO
       }
     });
   };
