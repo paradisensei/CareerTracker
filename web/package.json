@@ -10,7 +10,7 @@
     "ethereumjs-util": "^5.1.5",
     "ipfs-api": "^17.2.4",
     "material-ui": "^1.0.0-beta.21",
-    "node-fetch": "^1.7.3",
+    "node-fetch": "^2.6.1",
     "normalize.css": "^7.0.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
